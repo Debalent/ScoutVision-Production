@@ -5,7 +5,9 @@ import { PrismaClient } from '@prisma/client';
 
 
 import authRoutes from './routes/auth';
+
 import prospectsRoutes from './routes/prospects';
+import complianceRoutes from './routes/compliance';
 
 dotenv.config();
 
@@ -22,6 +24,8 @@ app.get('/health', (req, res) => {
 
 app.use('/auth', authRoutes);
 app.use('/prospects', prospectsRoutes);
+
+app.use('/compliance', complianceRoutes);
 // app.use('/programs', programsRoutes);
 // ...other modules
 
