@@ -1,0 +1,175 @@
+// Scout Vision - Core Database Schema
+// This schema defines the main tables for the recruiting platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @relation(fields: [roleId], references: [id])
+  roleId    String
+  program   Program? @relation(fields: [programId], references: [id])
+  programId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // ...other fields
+}
+
+model Role {
+  id    String  @id @default(uuid())
+  name  String  @unique
+  users User[]
+}
+
+model Program {
+  id        String   @id @default(uuid())
+  name      String
+  division  String
+  users     User[]
+  prospects Prospect[]
+}
+
+model Prospect {
+  id          String           @id @default(uuid())
+  firstName   String
+  lastName    String
+  bio         String?
+  email       String?
+  phone       String?
+  stats       ProspectStats?
+  academics   ProspectAcademics?
+  videos      Video[]
+  notes       Note[]
+  evaluations Evaluation[]
+  program     Program?         @relation(fields: [programId], references: [id])
+  programId   String?
+  stage       RecruitingStage? @relation(fields: [stageId], references: [id])
+  stageId     String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model ProspectStats {
+  id         String    @id @default(uuid())
+  gpa        Float?
+  sat        Int?
+  act        Int?
+  metrics    Json?
+  prospect   Prospect  @relation(fields: [prospectId], references: [id])
+  prospectId String    @unique
+}
+
+model ProspectAcademics {
+  id         String    @id @default(uuid())
+  school     String?
+  gradYear   Int?
+  major      String?
+  prospect   Prospect  @relation(fields: [prospectId], references: [id])
+  prospectId String    @unique
+}
+
+model Email {
+  id         String    @id @default(uuid())
+  to         String
+  from       String
+  subject    String
+  body       String
+  sentAt     DateTime  @default(now())
+  opened     Boolean   @default(false)
+  clicked    Boolean   @default(false)
+  prospect   Prospect? @relation(fields: [prospectId], references: [id])
+  prospectId String?
+}
+
+model RecruitingStage {
+  id        String     @id @default(uuid())
+  name      String
+  order     Int
+  prospects Prospect[]
+}
+
+model Note {
+  id         String    @id @default(uuid())
+  content    String
+  author     User?     @relation(fields: [authorId], references: [id])
+  authorId   String?
+  prospect   Prospect  @relation(fields: [prospectId], references: [id])
+  prospectId String
+  createdAt  DateTime  @default(now())
+}
+
+model Evaluation {
+  id         String    @id @default(uuid())
+  score      Int
+  comment    String?
+  author     User?     @relation(fields: [authorId], references: [id])
+  authorId   String?
+  prospect   Prospect  @relation(fields: [prospectId], references: [id])
+  prospectId String
+  createdAt  DateTime  @default(now())
+}
+
+model ComplianceEvent {
+  id         String    @id @default(uuid())
+  type       String
+  details    String?
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     String?
+  createdAt  DateTime  @default(now())
+}
+
+model Visit {
+  id         String    @id @default(uuid())
+  date       DateTime
+  location   String?
+  prospect   Prospect  @relation(fields: [prospectId], references: [id])
+  prospectId String
+  createdAt  DateTime  @default(now())
+}
+
+model Video {
+  id         String    @id @default(uuid())
+  url        String
+  type       String?
+  prospect   Prospect? @relation(fields: [prospectId], references: [id])
+  prospectId String?
+  clips      VideoClip[]
+  createdAt  DateTime  @default(now())
+}
+
+model VideoClip {
+  id         String    @id @default(uuid())
+  video      Video     @relation(fields: [videoId], references: [id])
+  videoId    String
+  start      Float
+  end        Float
+  rating     Int?
+  createdAt  DateTime  @default(now())
+}
+
+model PipelineMetric {
+  id         String    @id @default(uuid())
+  type       String
+  value      Float
+  program    Program?  @relation(fields: [programId], references: [id])
+  programId  String?
+  createdAt  DateTime  @default(now())
+}
+
+model AuditLog {
+  id         String    @id @default(uuid())
+  action     String
+  details    String?
+  user       User?     @relation(fields: [userId], references: [id])
+  userId     String?
+  createdAt  DateTime  @default(now())
+}
