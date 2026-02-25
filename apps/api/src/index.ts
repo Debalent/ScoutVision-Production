@@ -8,6 +8,7 @@ import authRoutes from './routes/auth';
 
 import prospectsRoutes from './routes/prospects';
 import complianceRoutes from './routes/compliance';
+import billingRoutes from './routes/billing';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/auth', authRoutes);
 app.use('/prospects', prospectsRoutes);
 
 app.use('/compliance', complianceRoutes);
+app.use('/billing', billingRoutes);
 // app.use('/programs', programsRoutes);
 // ...other modules
 
