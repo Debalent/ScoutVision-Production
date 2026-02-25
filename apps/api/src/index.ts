@@ -3,8 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 
+
 import authRoutes from './routes/auth';
-// import other route modules as needed
+import prospectsRoutes from './routes/prospects';
 
 dotenv.config();
 
@@ -18,8 +19,9 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'Scout Vision API' });
 });
 
+
 app.use('/auth', authRoutes);
-// app.use('/prospects', prospectsRoutes);
+app.use('/prospects', prospectsRoutes);
 // app.use('/programs', programsRoutes);
 // ...other modules
 
