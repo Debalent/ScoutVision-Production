@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { useSidebar } from './SidebarContext';
@@ -36,19 +35,13 @@ export default function Sidebar() {
         open ? 'translate-x-0' : '-translate-x-full'
       )}>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-white/5">
-        <Image
+      <div className="px-5 py-5 border-b border-white/5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/logo.png"
           alt="Scout Vision"
-          width={40}
-          height={40}
-          className="rounded-lg"
-          priority
+          className="w-full max-w-[200px] h-auto object-contain mx-auto"
         />
-        <div>
-          <h1 className="text-base font-bold tracking-tight text-white">Scout Vision</h1>
-          <p className="text-[10px] text-silver font-medium tracking-widest uppercase">Recruiting Intelligence</p>
-        </div>
       </div>
 
       {/* Navigation */}
