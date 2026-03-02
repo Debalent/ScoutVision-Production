@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { COMPLIANCE_EVENTS } from '../../../lib/mock-data';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+export const dynamic = 'force-dynamic';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export async function GET() {
-  const res = await fetch(`${API_URL}/compliance/events`);
-  const data = await res.json();
-  return NextResponse.json(data);
+  if (API_URL) {
+    try {
+      const res = await fetch(`${API_URL}/compliance/events`);
+      const data = await res.json();
+      return NextResponse.json(data);
+    } catch {
+      // Fall through to mock data
+    }
+  }
+  return NextResponse.json(COMPLIANCE_EVENTS);
 }
-
-// You can add POST handler here to proxy event creation if needed

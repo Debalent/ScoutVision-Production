@@ -1,27 +1,25 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-
-import Image from 'next/image';
-import AppIcon from './components/AppIcon';
+import Sidebar from './components/Sidebar';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Scout Vision',
-  description: 'Division II & III recruiting intelligence platform',
+  title: 'Scout Vision — Recruiting Intelligence Platform',
+  description: 'Division II & III recruiting intelligence. CRM, compliance, video scouting, and predictive analytics.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className + ' bg-navy text-white min-h-screen'}>
-        <header className="flex items-center p-6 gap-4">
-          <AppIcon className="rounded-xl" />
-          <Image src="/logo.png" alt="Scout Vision Logo" width={48} height={48} className="rounded-xl" />
-          <Image src="/app-icon.png" alt="Scout Vision Typography" width={180} height={48} className="ml-2" />
-        </header>
-        <main className="p-6">{children}</main>
+      <body className={inter.className + ' bg-navy text-white min-h-screen antialiased'}>
+        <Sidebar />
+        <main className="ml-[260px] min-h-screen">
+          <div className="max-w-[1440px] mx-auto px-6 py-6">
+            {children}
+          </div>
+        </main>
       </body>
     </html>
   );

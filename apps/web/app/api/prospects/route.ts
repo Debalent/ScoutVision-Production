@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PROSPECTS } from '../../lib/mock-data';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+export const dynamic = 'force-dynamic';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export async function GET() {
-  const res = await fetch(`${API_URL}/prospects`);
-  const data = await res.json();
-  return NextResponse.json(data);
+  // When backend is available, proxy to it
+  if (API_URL) {
+    try {
+      const res = await fetch(`${API_URL}/prospects`);
+      const data = await res.json();
+      return NextResponse.json(data);
+    } catch {
+      // Fall through to mock data
+    }
+  }
+  return NextResponse.json(PROSPECTS);
 }
-
-// You can add POST, PATCH, DELETE handlers here to proxy to backend as needed

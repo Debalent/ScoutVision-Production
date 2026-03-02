@@ -1,5 +1,6 @@
-// Scout Vision - Core Database Schema
-// This schema defines the main tables for the recruiting platform
+// Scout Vision - Production Database Schema
+// Recruiting intelligence platform for Division II & III athletics
+// SOC2-ready, acquisition-grade relational schema
 
 generator client {
   provider = "prisma-client-js"
@@ -10,166 +11,356 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── IDENTITY & ACCESS ──────────────────────────────────────────────
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  password  String
-  role      Role     @relation(fields: [roleId], references: [id])
-  roleId    String
-  program   Program? @relation(fields: [programId], references: [id])
-  programId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  // ...other fields
+  id           String           @id @default(uuid())
+  email        String           @unique
+  name         String?
+  avatarUrl    String?
+  password     String
+  role         Role             @relation(fields: [roleId], references: [id])
+  roleId       String
+  program      Program?         @relation(fields: [programId], references: [id])
+  programId    String?
+  isActive     Boolean          @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  notes        Note[]
+  evaluations  Evaluation[]
+  complianceEvents ComplianceEvent[]
+  auditLogs    AuditLog[]
+  contactLogs  ContactLog[]
+  emailsSent   Email[]
+
+  @@index([email])
+  @@index([programId])
 }
 
 model Role {
-  id    String  @id @default(uuid())
-  name  String  @unique
-  users User[]
+  id          String  @id @default(uuid())
+  name        String  @unique  // Admin, Coach, Assistant, Analyst
+  permissions Json?   // Granular permission flags
+  users       User[]
 }
+
+// ─── ORGANIZATION ───────────────────────────────────────────────────
 
 model Program {
-  id        String   @id @default(uuid())
-  name      String
-  division  String
-  users     User[]
-  prospects Prospect[]
+  id             String           @id @default(uuid())
+  name           String
+  sport          String           @default("Football")
+  division       String           // D2, D3, NAIA
+  conference     String?
+  logoUrl        String?
+  state          String?
+  subscriptionTier String         @default("starter") // starter, growth, elite
+  stripeCustomerId String?        @unique
+  stripeSubscriptionId String?
+  users          User[]
+  prospects      Prospect[]
+  stages         RecruitingStage[]
+  pipelineMetrics PipelineMetric[]
+  complianceEvents ComplianceEvent[]
+  recruitingPeriods RecruitingPeriod[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([division])
 }
 
+// ─── PROSPECTS & RECRUITING ─────────────────────────────────────────
+
 model Prospect {
-  id          String           @id @default(uuid())
-  firstName   String
-  lastName    String
-  bio         String?
-  email       String?
-  phone       String?
-  stats       ProspectStats?
-  academics   ProspectAcademics?
-  videos      Video[]
-  notes       Note[]
-  evaluations Evaluation[]
-  program     Program?         @relation(fields: [programId], references: [id])
-  programId   String?
-  stage       RecruitingStage? @relation(fields: [stageId], references: [id])
-  stageId     String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id              String           @id @default(uuid())
+  firstName       String
+  lastName        String
+  bio             String?
+  email           String?
+  phone           String?
+  imageUrl        String?
+  position        String?
+  height          String?
+  weight          Int?
+  highSchool      String?
+  clubTeam        String?
+  city            String?
+  state           String?
+  zipCode         String?
+  hudlUrl         String?
+  twitterUrl      String?
+  instagramUrl    String?
+  tags            String[]         @default([])
+  commitmentScore Float?           // AI-generated likelihood 0-100
+  classYear       Int?             // e.g. 2027
+  status          String           @default("active") // active, archived, committed, enrolled
+
+  stats           ProspectStats?
+  academics       ProspectAcademics?
+  videos          Video[]
+  notes           Note[]
+  evaluations     Evaluation[]
+  emails          Email[]
+  visits          Visit[]
+  contactLogs     ContactLog[]
+
+  program         Program?         @relation(fields: [programId], references: [id], onDelete: SetNull)
+  programId       String?
+  stage           RecruitingStage? @relation(fields: [stageId], references: [id])
+  stageId         String?
+  stageOrder      Int              @default(0)
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([programId])
+  @@index([stageId])
+  @@index([lastName, firstName])
+  @@index([state])
+  @@index([position])
+  @@index([classYear])
 }
 
 model ProspectStats {
-  id         String    @id @default(uuid())
-  gpa        Float?
-  sat        Int?
-  act        Int?
-  metrics    Json?
-  prospect   Prospect  @relation(fields: [prospectId], references: [id])
-  prospectId String    @unique
+  id             String    @id @default(uuid())
+  fortyYard      Float?
+  shuttle        Float?
+  vertical       Float?
+  bench          Int?
+  squat          Int?
+  broad          Float?
+  sportMetrics   Json?
+  prospect       Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId     String    @unique
+  updatedAt      DateTime  @updatedAt
 }
 
 model ProspectAcademics {
-  id         String    @id @default(uuid())
-  school     String?
-  gradYear   Int?
-  major      String?
-  prospect   Prospect  @relation(fields: [prospectId], references: [id])
-  prospectId String    @unique
-}
-
-model Email {
-  id         String    @id @default(uuid())
-  to         String
-  from       String
-  subject    String
-  body       String
-  sentAt     DateTime  @default(now())
-  opened     Boolean   @default(false)
-  clicked    Boolean   @default(false)
-  prospect   Prospect? @relation(fields: [prospectId], references: [id])
-  prospectId String?
+  id             String    @id @default(uuid())
+  gpa            Float?
+  satScore       Int?
+  actScore       Int?
+  school         String?
+  gradYear       Int?
+  intendedMajor  String?
+  ncaaEligible   Boolean?
+  coreGpa        Float?
+  prospect       Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId     String    @unique
+  updatedAt      DateTime  @updatedAt
 }
 
 model RecruitingStage {
-  id        String     @id @default(uuid())
-  name      String
-  order     Int
-  prospects Prospect[]
+  id          String     @id @default(uuid())
+  name        String
+  order       Int
+  color       String     @default("#6B7280")
+  program     Program    @relation(fields: [programId], references: [id], onDelete: Cascade)
+  programId   String
+  prospects   Prospect[]
+
+  @@unique([programId, order])
+  @@index([programId])
 }
 
+// ─── COMMUNICATION ──────────────────────────────────────────────────
+
+model Email {
+  id           String    @id @default(uuid())
+  to           String
+  from         String
+  subject      String
+  body         String
+  templateId   String?
+  sentAt       DateTime  @default(now())
+  openedAt     DateTime?
+  clickedAt    DateTime?
+  opened       Boolean   @default(false)
+  clicked      Boolean   @default(false)
+  bounced      Boolean   @default(false)
+
+  prospect     Prospect? @relation(fields: [prospectId], references: [id], onDelete: SetNull)
+  prospectId   String?
+  sender       User?     @relation(fields: [senderId], references: [id])
+  senderId     String?
+
+  @@index([prospectId])
+  @@index([sentAt])
+}
+
+model ContactLog {
+  id           String    @id @default(uuid())
+  type         String    // call, text, in-person, social, mail
+  direction    String    @default("outbound")
+  summary      String?
+  duration     Int?
+  prospect     Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId   String
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String
+  occurredAt   DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+
+  @@index([prospectId])
+  @@index([occurredAt])
+}
+
+// ─── EVALUATIONS & NOTES ────────────────────────────────────────────
+
 model Note {
-  id         String    @id @default(uuid())
-  content    String
-  author     User?     @relation(fields: [authorId], references: [id])
-  authorId   String?
-  prospect   Prospect  @relation(fields: [prospectId], references: [id])
-  prospectId String
-  createdAt  DateTime  @default(now())
+  id           String    @id @default(uuid())
+  content      String
+  isPinned     Boolean   @default(false)
+  author       User?     @relation(fields: [authorId], references: [id])
+  authorId     String?
+  prospect     Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId   String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([prospectId])
 }
 
 model Evaluation {
-  id         String    @id @default(uuid())
-  score      Int
-  comment    String?
-  author     User?     @relation(fields: [authorId], references: [id])
-  authorId   String?
-  prospect   Prospect  @relation(fields: [prospectId], references: [id])
-  prospectId String
-  createdAt  DateTime  @default(now())
+  id           String    @id @default(uuid())
+  overallScore Int
+  athleticism  Int?
+  academics    Int?
+  character    Int?
+  skillLevel   Int?
+  comment      String?
+  author       User?     @relation(fields: [authorId], references: [id])
+  authorId     String?
+  prospect     Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId   String
+  createdAt    DateTime  @default(now())
+
+  @@index([prospectId])
 }
 
+// ─── COMPLIANCE ─────────────────────────────────────────────────────
+
 model ComplianceEvent {
-  id         String    @id @default(uuid())
-  type       String
-  details    String?
-  user       User?     @relation(fields: [userId], references: [id])
-  userId     String?
-  createdAt  DateTime  @default(now())
+  id           String    @id @default(uuid())
+  type         String
+  title        String?
+  details      String?
+  severity     String    @default("info")
+  resolved     Boolean   @default(false)
+
+  program      Program?  @relation(fields: [programId], references: [id])
+  programId    String?
+  user         User?     @relation(fields: [userId], references: [id])
+  userId       String?
+  createdAt    DateTime  @default(now())
+
+  @@index([programId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model RecruitingPeriod {
+  id           String    @id @default(uuid())
+  type         String    // contact, quiet, dead, evaluation
+  sport        String    @default("Football")
+  startDate    DateTime
+  endDate      DateTime
+  description  String?
+  program      Program   @relation(fields: [programId], references: [id], onDelete: Cascade)
+  programId    String
+
+  @@index([programId])
+  @@index([startDate, endDate])
 }
 
 model Visit {
-  id         String    @id @default(uuid())
-  date       DateTime
-  location   String?
-  prospect   Prospect  @relation(fields: [prospectId], references: [id])
-  prospectId String
-  createdAt  DateTime  @default(now())
+  id           String    @id @default(uuid())
+  type         String    @default("unofficial")
+  date         DateTime
+  location     String?
+  notes        String?
+  status       String    @default("scheduled")
+  prospect     Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId   String
+  createdAt    DateTime  @default(now())
+
+  @@index([prospectId])
+  @@index([date])
 }
 
+// ─── VIDEO SCOUTING ─────────────────────────────────────────────────
+
 model Video {
-  id         String    @id @default(uuid())
-  url        String
-  type       String?
-  prospect   Prospect? @relation(fields: [prospectId], references: [id])
-  prospectId String?
-  clips      VideoClip[]
-  createdAt  DateTime  @default(now())
+  id           String      @id @default(uuid())
+  title        String?
+  url          String
+  type         String?
+  sourceType   String      @default("link")
+  storagePath  String?
+  thumbnailUrl String?
+  duration     Float?
+  status       String      @default("ready")
+  aiTags       Json?
+  aiMetrics    Json?
+
+  prospect     Prospect?   @relation(fields: [prospectId], references: [id], onDelete: SetNull)
+  prospectId   String?
+  clips        VideoClip[]
+  createdAt    DateTime    @default(now())
+
+  @@index([prospectId])
 }
 
 model VideoClip {
-  id         String    @id @default(uuid())
-  video      Video     @relation(fields: [videoId], references: [id])
-  videoId    String
-  start      Float
-  end        Float
-  rating     Int?
-  createdAt  DateTime  @default(now())
+  id           String    @id @default(uuid())
+  title        String?
+  video        Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId      String
+  startTime    Float
+  endTime      Float
+  rating       Int?
+  tags         String[]  @default([])
+  notes        String?
+  shareToken   String?   @unique
+  createdAt    DateTime  @default(now())
+
+  @@index([videoId])
 }
+
+// ─── ANALYTICS & PIPELINE ───────────────────────────────────────────
 
 model PipelineMetric {
-  id         String    @id @default(uuid())
-  type       String
-  value      Float
-  program    Program?  @relation(fields: [programId], references: [id])
-  programId  String?
-  createdAt  DateTime  @default(now())
+  id           String    @id @default(uuid())
+  type         String
+  dimension    String?
+  value        Float
+  metadata     Json?
+  program      Program?  @relation(fields: [programId], references: [id])
+  programId    String?
+  period       String?
+  createdAt    DateTime  @default(now())
+
+  @@index([programId])
+  @@index([type])
 }
 
+// ─── AUDIT & SECURITY ───────────────────────────────────────────────
+
 model AuditLog {
-  id         String    @id @default(uuid())
-  action     String
-  details    String?
-  user       User?     @relation(fields: [userId], references: [id])
-  userId     String?
-  createdAt  DateTime  @default(now())
+  id           String    @id @default(uuid())
+  action       String
+  entity       String?
+  entityId     String?
+  details      String?
+  ipAddress    String?
+  userAgent    String?
+  user         User?     @relation(fields: [userId], references: [id])
+  userId       String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
 }
