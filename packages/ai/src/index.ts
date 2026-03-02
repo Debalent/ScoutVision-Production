@@ -75,3 +75,15 @@ export {
   createFrameExtractor,
   computeSampleIndices,
 } from './pipeline';
+
+// Deploy
+export {
+  type DeploymentConfig,
+  type AnalysisJob,
+  type JobQueue,
+  type HealthStatus,
+  DEFAULT_DEPLOYMENT,
+  MemoryJobQueue,
+  InferenceWorker,
+  HealthMonitor,
+} from './deploy';

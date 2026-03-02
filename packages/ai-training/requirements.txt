@@ -1,0 +1,22 @@
+# ScoutVision AI Training Pipeline
+# Python training scripts for CV, pose, and sport-specific models
+
+torch>=2.1.0
+torchvision>=0.16.0
+onnx>=1.15.0
+onnxruntime>=1.16.0
+ultralytics>=8.1.0
+opencv-python>=4.9.0
+albumentations>=1.3.0
+pycocotools>=2.0.7
+wandb>=0.16.0
+tensorboard>=2.15.0
+numpy>=1.24.0
+scipy>=1.11.0
+scikit-learn>=1.3.0
+pandas>=2.1.0
+pillow>=10.0.0
+pyyaml>=6.0.0
+tqdm>=4.66.0
+einops>=0.7.0
+timm>=0.9.0

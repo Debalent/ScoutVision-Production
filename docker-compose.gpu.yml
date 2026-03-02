@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# ScoutVision — Docker Compose (GPU Inference + Training + Dependencies)
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+  # ─── Redis (Job Queue) ─────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ─── GPU Inference Server ──────────────────────────────────────────────
+  inference:
+    build:
+      context: .
+      dockerfile: packages/ai/Dockerfile.gpu
+    ports:
+      - '8080:8080'
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - SCOUTVISION_MODEL_DIR=/models
+      - SCOUTVISION_TEMP_DIR=/tmp/scoutvision
+    volumes:
+      - ./models:/models:ro
+      - video-temp:/tmp/scoutvision
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ─── Training Worker ───────────────────────────────────────────────────
+  training:
+    build:
+      context: .
+      dockerfile: packages/ai-training/Dockerfile
+    environment:
+      - WANDB_API_KEY=${WANDB_API_KEY}
+      - SCOUTVISION_DATA_DIR=/data
+      - SCOUTVISION_CHECKPOINT_DIR=/checkpoints
+      - SCOUTVISION_EXPORT_DIR=/exports
+    volumes:
+      - ./data:/data:ro
+      - ./checkpoints:/checkpoints
+      - ./exports:/exports
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    profiles:
+      - training  # Only start when: docker compose --profile training up
+
+  # ─── MinIO (S3-compatible object storage for videos/models) ────────────
+  minio:
+    image: minio/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - MINIO_ROOT_USER=scoutvision
+      - MINIO_ROOT_PASSWORD=scoutvision-dev
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis-data:
+  minio-data:
+  video-temp:

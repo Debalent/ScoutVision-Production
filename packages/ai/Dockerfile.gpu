@@ -1,0 +1,52 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# ScoutVision AI — GPU Inference Dockerfile
+# Multi-stage build: build TypeScript → run with ONNX Runtime GPU
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Stage 1: Build
+FROM node:20-slim AS builder
+WORKDIR /app
+
+COPY packages/ai/package.json packages/ai/tsconfig.json ./packages/ai/
+COPY packages/ai/src/ ./packages/ai/src/
+
+WORKDIR /app/packages/ai
+RUN npm install --ignore-scripts
+RUN npx tsc --outDir dist
+
+# Stage 2: Runtime with ONNX GPU
+FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
+
+# Install Node.js
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy built artifacts
+COPY --from=builder /app/packages/ai/dist/ ./packages/ai/dist/
+COPY --from=builder /app/packages/ai/package.json ./packages/ai/
+
+WORKDIR /app/packages/ai
+RUN npm install --omit=dev --ignore-scripts && \
+    npm install onnxruntime-gpu@1.17.0
+
+# Model directory
+RUN mkdir -p /models /tmp/scoutvision
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+ENV NODE_ENV=production
+ENV SCOUTVISION_MODEL_DIR=/models
+ENV SCOUTVISION_TEMP_DIR=/tmp/scoutvision
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+EXPOSE 8080
+
+CMD ["node", "dist/deploy/server.js"]
