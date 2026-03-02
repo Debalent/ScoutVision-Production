@@ -130,7 +130,25 @@ docker compose -f docker-compose.gpu.yml --profile training up  # Training
 | POST   | /api/reports            | Generate AI scouting report        |
 | GET    | /api/reports            | Retrieve saved reports             |
 | POST   | /api/search             | Natural language prospect search   |
+| POST   | /api/uploads            | Initiate file upload               |
+| GET    | /api/uploads            | List uploaded files                |
 | GET    | /api/compliance/events  | List compliance events             |
+
+---
+
+## Pages and Navigation
+
+| Route         | Page                  | Description                                          |
+|---------------|-----------------------|------------------------------------------------------|
+| /             | Dashboard             | KPI stats, activity feed, pipeline snapshot, AI insights |
+| /crm          | Recruiting CRM        | Kanban board and table view with search and filters  |
+| /prospect     | Prospect Profile      | 7-tab profile: overview, stats, evaluations, film, AI, comms, timeline |
+| /compare      | Prospect Comparison   | Side-by-side comparison for up to 4 prospects        |
+| /compliance   | Compliance Center     | NCAA period tracking, alerts, and audit trail        |
+| /analytics    | Analytics             | Pipeline funnel, geographic, position fill, predictive |
+| /reports      | Reports               | AI report generation, templates, and archive         |
+| /video        | Video Scout           | Film library with upload and AI analysis             |
+| /settings     | Settings              | 6-tab admin: general, team, integrations, notifications, billing, security |
 
 ---
 
@@ -194,9 +212,9 @@ cd apps/api && npm run dev
 
 ## Database Schema
 
-The Prisma schema (prisma/schema.prisma) includes 15 normalized tables:
+The Prisma schema (prisma/schema.prisma) includes 22+ normalized tables:
 
-- User, Role -- identity and access control
+- User, Session, Role -- identity, sessions, and access control
 - Program -- organization and subscription management
 - Prospect, ProspectStats, ProspectAcademics -- athlete profiles
 - RecruitingStage -- pipeline stages per program
@@ -205,6 +223,11 @@ The Prisma schema (prisma/schema.prisma) includes 15 normalized tables:
 - ComplianceEvent, RecruitingPeriod -- NCAA compliance
 - Visit -- campus visit scheduling
 - Video, VideoClip -- film library with AI metadata
+- AIAnalysis, AIReport -- AI pipeline results and generated reports
+- Upload -- file upload management with progress tracking
+- SavedSearch -- natural language search history
+- BoardTemplate -- custom Kanban board configurations
+- Notification -- real-time notification system
 - PipelineMetric -- analytics and funnel data
 - AuditLog -- SOC2-ready audit trail
 
@@ -214,7 +237,9 @@ The Prisma schema (prisma/schema.prisma) includes 15 normalized tables:
 
 - Phase 1 (Complete): Full-stack frontend with CRM, compliance, video scouting, analytics, and dashboard
 - Phase 2 (Complete): AI/CV inference engine, biomechanics, sport modules, predictive models, LLM intelligence, training pipeline, GPU deployment
-- Phase 3 (In Progress): Enhanced schema, upload system, UI design system, testing, deployment configuration
+- Phase 3 (Complete): Enhanced schema, upload system, UI design system, component library, testing strategy, deployment configuration
+- Phase 4 (Complete): Settings/admin, prospect profiles, prospect comparison, reports and intelligence, top bar with command palette, navigation
+- Phase 5 (Complete): Error boundaries, loading states, 404 page, middleware (rate limiting, CORS, security headers), auth/RBAC system, validation, custom hooks, SEO/meta/PWA, performance optimization
 
 ---
 
