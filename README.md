@@ -12,7 +12,7 @@
 
 ## Overview
 
-ScoutVision is a production-grade, AI-powered scouting and recruiting intelligence platform built for Division II, Division III, and NAIA athletic programs. It combines computer vision, biomechanics analysis, predictive modeling, and LLM-powered intelligence into a unified platform that transforms raw game film into actionable recruiting insights.
+ScoutVision is a production-grade, AI-powered scouting and recruiting intelligence platform built for collegiate and professional athletic programs at every level. From Power Five conferences to Division II, Division III, NAIA, and junior college programs, ScoutVision adapts to any organization that evaluates athletic talent. It supports football, basketball, soccer, baseball, and track and field with sport-specific analytics modules, and combines computer vision, biomechanics analysis, predictive modeling, and LLM-powered intelligence into a unified platform that transforms raw game film into actionable recruiting insights.
 
 ---
 
@@ -52,7 +52,7 @@ ScoutVision-Production/
 - Kanban-style prospect pipeline with drag-and-drop stages
 - Prospect profiles with stats, academics, evaluations, and contact history
 - Communication tracking (calls, texts, emails, visits)
-- Compliance monitoring with NCAA period enforcement
+- Compliance monitoring with configurable rule sets (NCAA, NAIA, conference-specific)
 
 ### 2. Video Scouting
 - Film library with upload, search, and AI tagging
@@ -67,11 +67,14 @@ ScoutVision-Production/
 - Biomechanics engine: joint angles, center of mass, stride analysis, jump analysis, fatigue detection, injury risk assessment
 
 ### 4. Sport-Specific Analytics
+Each sport module extracts discipline-specific metrics from video and sensor data:
 - Football: burst score, route separation, pocket movement, play classification
 - Basketball: shot release speed, defensive footwork, court coverage
 - Soccer: sprint acceleration, pressing intensity, off-ball movement
 - Baseball: pitch velocity, bat speed, exit velocity, catcher pop time
 - Track and Field: stride efficiency, max velocity, block start, ground contact asymmetry
+
+Modules are designed to be extensible so additional sports can be added with minimal configuration.
 
 ### 5. Predictive Models
 - Performance projection with age-curve modeling
@@ -240,6 +243,36 @@ The Prisma schema (prisma/schema.prisma) includes 22+ normalized tables:
 - Phase 3 (Complete): Enhanced schema, upload system, UI design system, component library, testing strategy, deployment configuration
 - Phase 4 (Complete): Settings/admin, prospect profiles, prospect comparison, reports and intelligence, top bar with command palette, navigation
 - Phase 5 (Complete): Error boundaries, loading states, 404 page, middleware (rate limiting, CORS, security headers), auth/RBAC system, validation, custom hooks, SEO/meta/PWA, performance optimization
+- Phase 6 (Complete): GitHub Pages static deployment for mobile preview
+
+---
+
+## Deployment
+
+### Vercel (Production)
+
+The primary deployment target is Vercel with server-side rendering:
+
+```bash
+vercel --prod
+```
+
+### GitHub Pages (Static Preview)
+
+A static export is deployed automatically on every push to main via GitHub Actions. View the live preview at:
+
+```
+https://debalent.github.io/ScoutVision-Production/
+```
+
+The static build uses client-side rendering with mock data, so all pages are fully interactive without a backend.
+
+### Docker (Self-Hosted)
+
+```bash
+docker compose up              # Standard stack
+docker compose -f docker-compose.gpu.yml up  # GPU inference
+```
 
 ---
 

@@ -74,7 +74,7 @@ model Program {
   id             String           @id @default(uuid())
   name           String
   sport          String           @default("Football")
-  division       String           // D2, D3, NAIA, D1-FCS
+  division       String           // D1, D2, D3, NAIA, JUCO
   conference     String?
   logoUrl        String?
   state          String?

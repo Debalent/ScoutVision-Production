@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: 'Scout Vision — Recruiting Intelligence Platform',
     template: '%s | Scout Vision',
   },
-  description: 'AI-powered multi-sport recruiting intelligence. CRM, compliance tracking, video scouting, predictive analytics, and biomechanical analysis for Division II and III programs.',
+  description: 'AI-powered multi-sport recruiting intelligence. CRM, compliance tracking, video scouting, predictive analytics, and biomechanical analysis for athletic programs at every level.',
   keywords: ['recruiting', 'scouting', 'sports analytics', 'CRM', 'NCAA', 'compliance', 'AI', 'video analysis', 'college recruiting'],
   authors: [{ name: 'ScoutVision Team' }],
   creator: 'ScoutVision',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     siteName: 'Scout Vision',
     title: 'Scout Vision — Recruiting Intelligence Platform',
-    description: 'AI-powered recruiting intelligence for college sports programs. Streamline scouting, ensure compliance, and make data-driven decisions.',
+    description: 'AI-powered recruiting intelligence for athletic programs at every level. Streamline scouting, ensure compliance, and make data-driven decisions.',
     images: [
       {
         url: '/og-image.png',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Scout Vision — Recruiting Intelligence Platform',
-    description: 'AI-powered recruiting intelligence for college sports programs.',
+    description: 'AI-powered recruiting intelligence for athletic programs at every level.',
     images: ['/og-image.png'],
   },
   robots: {
