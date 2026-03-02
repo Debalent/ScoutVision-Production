@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '../lib/utils';
+import { useSidebar } from './SidebarContext';
 
 const NAV_ITEMS = [
   { href: '/',           label: 'Dashboard',   icon: DashboardIcon },
@@ -17,9 +18,22 @@ const NAV_ITEMS = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { open, close } = useSidebar();
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-charcoal border-r border-white/5 flex flex-col z-50">
+    <>
+      {/* Mobile backdrop */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={close}
+        />
+      )}
+      <aside className={cn(
+        'fixed left-0 top-0 bottom-0 w-[260px] bg-charcoal border-r border-white/5 flex flex-col z-50 transition-transform duration-200 ease-in-out',
+        'lg:translate-x-0',
+        open ? 'translate-x-0' : '-translate-x-full'
+      )}>
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-electric to-cyan-400 flex items-center justify-center shadow-lg shadow-electric/20">
@@ -42,6 +56,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={close}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
                 isActive
@@ -78,6 +93,7 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
 

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import NotificationCenter from './NotificationCenter';
+import { useSidebar } from './SidebarContext';
 
 export default function TopBar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -39,9 +40,22 @@ export default function TopBar() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const { toggle } = useSidebar();
+
   return (
-    <div className="sticky top-0 z-40 bg-navy/80 backdrop-blur-xl border-b border-white/5">
-      <div className="max-w-[1440px] mx-auto px-6 h-14 flex items-center justify-between gap-4">
+    <div className="sticky top-0 z-30 bg-navy/80 backdrop-blur-xl border-b border-white/5">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3 sm:gap-4">
+        {/* Mobile menu toggle */}
+        <button
+          onClick={toggle}
+          className="lg:hidden p-2 -ml-1 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all shrink-0"
+          aria-label="Toggle menu"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+
         {/* Global Search */}
         <div className="flex-1 max-w-lg">
           <button
@@ -54,8 +68,9 @@ export default function TopBar() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
             </svg>
-            <span>Search prospects, videos, reports...</span>
-            <kbd className="ml-auto text-[10px] text-gray-600 bg-white/5 px-1.5 py-0.5 rounded font-mono">Ctrl+K</kbd>
+            <span className="hidden sm:inline">Search prospects, videos, reports...</span>
+            <span className="sm:hidden">Search...</span>
+            <kbd className="ml-auto text-[10px] text-gray-600 bg-white/5 px-1.5 py-0.5 rounded font-mono hidden sm:inline">Ctrl+K</kbd>
           </button>
         </div>
 

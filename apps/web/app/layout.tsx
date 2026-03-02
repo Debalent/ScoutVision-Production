@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
+import { SidebarProvider } from './components/SidebarContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -77,13 +78,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark">
       <body className={inter.className + ' bg-navy text-white min-h-screen antialiased'}>
-        <Sidebar />
-        <main className="ml-[260px] min-h-screen">
-          <TopBar />
-          <div className="max-w-[1440px] mx-auto px-6 py-6">
-            {children}
-          </div>
-        </main>
+        <SidebarProvider>
+          <Sidebar />
+          <main className="lg:ml-[260px] min-h-screen transition-[margin] duration-200">
+            <TopBar />
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+              {children}
+            </div>
+          </main>
+        </SidebarProvider>
       </body>
     </html>
   );
