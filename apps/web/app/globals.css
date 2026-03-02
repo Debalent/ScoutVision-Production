@@ -133,6 +133,10 @@ body {
     @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.06];
   }
 
+  .glass-strong {
+    @apply bg-white/[0.06] backdrop-blur-2xl border border-white/[0.08];
+  }
+
   /* Kanban column */
   .kanban-column {
     @apply flex flex-col min-w-[280px] max-w-[320px] bg-navy/30 rounded-xl border border-white/5;
@@ -150,6 +154,105 @@ body {
   .table-row {
     @apply border-b border-white/5 hover:bg-white/[0.02] transition-colors;
   }
+
+  /* Tooltips */
+  .tooltip {
+    @apply absolute z-50 px-2.5 py-1.5 text-xs font-medium text-white bg-charcoal
+           border border-white/10 rounded-lg shadow-lg
+           opacity-0 pointer-events-none transition-opacity duration-150;
+  }
+
+  .tooltip-visible {
+    @apply opacity-100;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    @apply flex items-center gap-1 bg-charcoal rounded-xl p-1;
+  }
+
+  .tab-item {
+    @apply px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all;
+  }
+
+  .tab-item-active {
+    @apply tab-item bg-electric/10 text-electric;
+  }
+
+  .tab-item-inactive {
+    @apply tab-item text-gray-400 hover:text-white;
+  }
+
+  /* Skeleton loading */
+  .skeleton {
+    @apply bg-white/5 rounded-lg animate-pulse;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-white/5;
+  }
+
+  /* Dot indicator */
+  .dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .dot-green { @apply dot bg-green-400; }
+  .dot-amber { @apply dot bg-amber-400; }
+  .dot-red { @apply dot bg-red-400; }
+  .dot-electric { @apply dot bg-electric; }
+
+  /* Overlay */
+  .overlay {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40;
+  }
+
+  /* Modal */
+  .modal {
+    @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+  }
+
+  .modal-content {
+    @apply card p-0 w-full max-w-lg max-h-[90vh] overflow-y-auto animate-scale-in;
+  }
+
+  /* Avatar */
+  .avatar {
+    @apply w-10 h-10 rounded-full bg-electric/10 flex items-center justify-center
+           text-electric text-sm font-bold;
+  }
+
+  .avatar-sm {
+    @apply w-8 h-8 rounded-full bg-electric/10 flex items-center justify-center
+           text-electric text-xs font-bold;
+  }
+
+  .avatar-lg {
+    @apply w-14 h-14 rounded-full bg-electric/10 flex items-center justify-center
+           text-electric text-lg font-bold;
+  }
+
+  /* Progress ring */
+  .progress-ring {
+    @apply relative inline-flex items-center justify-center;
+  }
+
+  /* Metric card */
+  .metric-card {
+    @apply card px-5 py-4 flex flex-col gap-1;
+  }
+
+  /* Tag */
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium
+           bg-white/5 text-gray-300 border border-white/5;
+  }
+
+  .tag-electric { @apply tag bg-electric/10 text-electric border-electric/20; }
+  .tag-green { @apply tag bg-emerald-500/10 text-emerald-400 border-emerald-500/20; }
+  .tag-amber { @apply tag bg-amber-500/10 text-amber-400 border-amber-500/20; }
+  .tag-red { @apply tag bg-red-500/10 text-red-400 border-red-500/20; }
 }
 
 /* ─── Animations ─────────────────────────────────────────────────── */

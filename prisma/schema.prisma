@@ -1,5 +1,5 @@
 // Scout Vision - Production Database Schema
-// Recruiting intelligence platform for Division II & III athletics
+// Multi-sport AI recruiting intelligence platform
 // SOC2-ready, acquisition-grade relational schema
 
 generator client {
@@ -25,6 +25,9 @@ model User {
   programId    String?
   isActive     Boolean          @default(true)
   lastLoginAt  DateTime?
+  mfaEnabled   Boolean          @default(false)
+  mfaSecret    String?
+  preferences  Json?            // UI preferences, notification settings
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
@@ -34,14 +37,33 @@ model User {
   auditLogs    AuditLog[]
   contactLogs  ContactLog[]
   emailsSent   Email[]
+  uploads      Upload[]
+  savedSearches SavedSearch[]
+  notifications Notification[]
+  sessions     Session[]
 
   @@index([email])
   @@index([programId])
 }
 
+model Session {
+  id           String    @id @default(uuid())
+  token        String    @unique
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
 model Role {
   id          String  @id @default(uuid())
-  name        String  @unique  // Admin, Coach, Assistant, Analyst
+  name        String  @unique  // Admin, Coach, Assistant, Analyst, Scout, Viewer
   permissions Json?   // Granular permission flags
   users       User[]
 }
@@ -52,23 +74,34 @@ model Program {
   id             String           @id @default(uuid())
   name           String
   sport          String           @default("Football")
-  division       String           // D2, D3, NAIA
+  division       String           // D2, D3, NAIA, D1-FCS
   conference     String?
   logoUrl        String?
   state          String?
-  subscriptionTier String         @default("starter") // starter, growth, elite
+  primaryColor   String?          // Brand color
+  secondaryColor String?
+  website        String?
+  subscriptionTier String         @default("starter") // starter, growth, elite, enterprise
   stripeCustomerId String?        @unique
   stripeSubscriptionId String?
+  maxUsers       Int              @default(5)
+  maxProspects   Int              @default(200)
+  maxStorage     Int              @default(10240) // MB
+  features       Json?            // Feature flags per tier
   users          User[]
   prospects      Prospect[]
   stages         RecruitingStage[]
   pipelineMetrics PipelineMetric[]
   complianceEvents ComplianceEvent[]
   recruitingPeriods RecruitingPeriod[]
+  uploads        Upload[]
+  boardTemplates BoardTemplate[]
+  notifications  Notification[]
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
 
   @@index([division])
+  @@index([sport])
 }
 
 // ─── PROSPECTS & RECRUITING ─────────────────────────────────────────
@@ -82,6 +115,7 @@ model Prospect {
   phone           String?
   imageUrl        String?
   position        String?
+  secondaryPosition String?
   height          String?
   weight          Int?
   highSchool      String?
@@ -92,10 +126,13 @@ model Prospect {
   hudlUrl         String?
   twitterUrl      String?
   instagramUrl    String?
+  maxPrepsUrl     String?
+  rivalUrl        String?
   tags            String[]         @default([])
   commitmentScore Float?           // AI-generated likelihood 0-100
   classYear       Int?             // e.g. 2027
-  status          String           @default("active") // active, archived, committed, enrolled
+  status          String           @default("active") // active, archived, committed, enrolled, decommitted
+  tier            String?          // priority, target, sleeper, depth
 
   stats           ProspectStats?
   academics       ProspectAcademics?
@@ -105,6 +142,8 @@ model Prospect {
   emails          Email[]
   visits          Visit[]
   contactLogs     ContactLog[]
+  aiReports       AIReport[]
+  aiAnalyses      AIAnalysis[]
 
   program         Program?         @relation(fields: [programId], references: [id], onDelete: SetNull)
   programId       String?
@@ -121,6 +160,8 @@ model Prospect {
   @@index([state])
   @@index([position])
   @@index([classYear])
+  @@index([status])
+  @@index([tier])
 }
 
 model ProspectStats {
@@ -296,21 +337,30 @@ model Video {
   id           String      @id @default(uuid())
   title        String?
   url          String
-  type         String?
-  sourceType   String      @default("link")
+  type         String?     // game, practice, combine, highlight
+  sourceType   String      @default("link") // link, upload, hudl, youtube
   storagePath  String?
   thumbnailUrl String?
   duration     Float?
-  status       String      @default("ready")
+  fileSize     Int?        // bytes
+  resolution   String?     // 1080p, 720p, 4K
+  fps          Float?
+  status       String      @default("ready") // uploading, processing, ready, analyzed, failed
   aiTags       Json?
   aiMetrics    Json?
+  sport        String      @default("football")
 
   prospect     Prospect?   @relation(fields: [prospectId], references: [id], onDelete: SetNull)
   prospectId   String?
   clips        VideoClip[]
+  analyses     AIAnalysis[]
+  upload       Upload?     @relation(fields: [uploadId], references: [id])
+  uploadId     String?
   createdAt    DateTime    @default(now())
 
   @@index([prospectId])
+  @@index([status])
+  @@index([sport])
 }
 
 model VideoClip {
@@ -324,9 +374,149 @@ model VideoClip {
   tags         String[]  @default([])
   notes        String?
   shareToken   String?   @unique
+  thumbnailUrl String?
   createdAt    DateTime  @default(now())
 
   @@index([videoId])
+  @@index([shareToken])
+}
+
+// ─── AI ANALYSIS ────────────────────────────────────────────────────
+
+model AIAnalysis {
+  id              String    @id @default(uuid())
+  videoId         String
+  video           Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  prospectId      String?
+  prospect        Prospect? @relation(fields: [prospectId], references: [id], onDelete: SetNull)
+  sport           String    @default("football")
+  status          String    @default("queued") // queued, processing, completed, failed
+  progress        Int       @default(0)
+  currentStage    String?
+  processingTimeMs Int?
+  framesProcessed Int?
+
+  // Results stored as JSON for flexibility
+  playerDetections Json?   // Array of detected player summaries
+  highlights       Json?   // Array of highlight moments
+  plays            Json?   // Array of classified plays
+  biomechanics     Json?   // Biomechanics analysis results
+  sportMetrics     Json?   // Sport-specific computed metrics
+  overallGrade     String?
+  aiInsights       Json?   // Array of insight strings
+
+  error           String?
+  modelVersions   Json?    // Versions of models used
+  gpuDeviceId     Int?
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+
+  @@index([videoId])
+  @@index([prospectId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AIReport {
+  id                  String    @id @default(uuid())
+  prospectId          String
+  prospect            Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  sport               String    @default("football")
+  type                String    @default("scouting") // scouting, game_summary, comparison, team_fit
+  overallGrade        String?
+  summary             String?
+  strengths           Json?     // string[]
+  weaknesses          Json?     // string[]
+  projections         Json?     // performance projections
+  comparisons         Json?     // player comparisons
+  recommendation      String?
+  fitScore            Float?
+  recruitingPriority  String?   // must-have, high, medium, low, monitor
+  llmProvider         String?   // openai, anthropic
+  llmModel            String?   // gpt-4, claude-3-opus, etc.
+  promptTokens        Int?
+  completionTokens    Int?
+  createdAt           DateTime  @default(now())
+
+  @@index([prospectId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ─── UPLOAD SYSTEM ──────────────────────────────────────────────────
+
+model Upload {
+  id           String    @id @default(uuid())
+  fileName     String
+  originalName String
+  mimeType     String
+  fileSize     Int       // bytes
+  storagePath  String
+  storageUrl   String?
+  status       String    @default("uploading") // uploading, processing, ready, failed
+  progress     Int       @default(0)
+  category     String    @default("video") // video, document, image, csv
+  metadata     Json?     // dimensions, duration, codec, etc.
+  checksum     String?   // SHA-256
+
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  programId    String?
+  program      Program?  @relation(fields: [programId], references: [id])
+  videos       Video[]
+  createdAt    DateTime  @default(now())
+  completedAt  DateTime?
+
+  @@index([userId])
+  @@index([programId])
+  @@index([status])
+  @@index([category])
+}
+
+// ─── SAVED SEARCHES & BOARD TEMPLATES ───────────────────────────────
+
+model SavedSearch {
+  id         String   @id @default(uuid())
+  name       String
+  query      String   // Natural language query
+  filters    Json?    // Parsed filter object
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPinned   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model BoardTemplate {
+  id         String   @id @default(uuid())
+  name       String
+  stages     Json     // Array of { name, color, order }
+  isDefault  Boolean  @default(false)
+  programId  String
+  program    Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([programId])
+}
+
+// ─── NOTIFICATIONS ──────────────────────────────────────────────────
+
+model Notification {
+  id         String    @id @default(uuid())
+  type       String    // analysis_complete, report_ready, compliance_alert, visit_reminder, stage_change
+  title      String
+  message    String?
+  link       String?   // Deep link into the app
+  read       Boolean   @default(false)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId  String?
+  program    Program?  @relation(fields: [programId], references: [id])
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, read])
+  @@index([createdAt])
 }
 
 // ─── ANALYTICS & PIPELINE ───────────────────────────────────────────
@@ -350,17 +540,21 @@ model PipelineMetric {
 
 model AuditLog {
   id           String    @id @default(uuid())
-  action       String
-  entity       String?
+  action       String    // create, update, delete, login, logout, export, ai_analysis, report_generated
+  entity       String?   // prospect, video, evaluation, etc.
   entityId     String?
   details      String?
+  oldValue     Json?     // Previous state for update tracking
+  newValue     Json?     // New state for update tracking
   ipAddress    String?
   userAgent    String?
   user         User?     @relation(fields: [userId], references: [id])
   userId       String?
+  duration     Int?      // Operation duration in ms
   createdAt    DateTime  @default(now())
 
   @@index([userId])
   @@index([action])
+  @@index([entity, entityId])
   @@index([createdAt])
 }
