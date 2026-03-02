@@ -5,7 +5,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0B1120",
-  "theme_color": "#00E6FF",
+  "theme_color": "#22C55E",
   "orientation": "any",
   "categories": ["sports", "business", "productivity"],
   "icons": [

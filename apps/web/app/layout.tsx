@@ -8,7 +8,7 @@ import { SidebarProvider } from './components/SidebarContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const viewport: Viewport = {
-  themeColor: '#00E6FF',
+  themeColor: '#22C55E',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,

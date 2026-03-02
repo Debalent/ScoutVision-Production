@@ -41,7 +41,7 @@ export default function ProspectProfileClient({ params }: { params: { id: string
         <div className="lg:col-span-3 space-y-4">
           <div className="card p-5 space-y-4">
             <div className="flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-2xl font-bold text-electric mb-3">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-2xl font-bold text-electric mb-3">
                 {getInitials(fullName)}
               </div>
               <h1 className="text-xl font-bold">{fullName}</h1>
@@ -162,7 +162,7 @@ export default function ProspectProfileClient({ params }: { params: { id: string
                   )}>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-[9px] font-bold text-electric">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-[9px] font-bold text-electric">
                           {note.authorName ? getInitials(note.authorName) : '?'}
                         </div>
                         <span className="text-xs font-medium">{note.authorName || 'Unknown'}</span>

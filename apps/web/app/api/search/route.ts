@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PROSPECTS } from '../../../lib/mock-data';
+import { PROSPECTS } from '../../lib/mock-data';
 
 export const dynamic = 'force-dynamic';
 

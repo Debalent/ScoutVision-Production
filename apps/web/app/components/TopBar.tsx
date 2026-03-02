@@ -99,7 +99,7 @@ export default function TopBar() {
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-xl hover:bg-white/5 transition-all"
             >
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-electric/30 to-purple-500/30 flex items-center justify-center text-[10px] font-bold text-electric">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-electric/30 to-emerald-500/30 flex items-center justify-center text-[10px] font-bold text-electric">
                 CR
               </div>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">

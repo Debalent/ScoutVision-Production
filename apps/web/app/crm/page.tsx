@@ -169,7 +169,7 @@ function KanbanCard({ prospect, stageColor }: { prospect: Prospect; stageColor: 
       <div className="card-hover p-3 space-y-2 cursor-pointer group">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-[10px] font-bold text-electric">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-electric">
               {getInitials(fullName)}
             </div>
             <div>
@@ -244,7 +244,7 @@ function ProspectTable({ prospects }: { prospects: Prospect[] }) {
                 <tr key={p.id} className="table-row">
                   <td className="table-cell">
                     <Link href={`/crm/${p.id}`} className="flex items-center gap-3 hover:text-electric transition-colors">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-[10px] font-bold text-electric shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-electric shrink-0">
                         {getInitials(`${p.firstName} ${p.lastName}`)}
                       </div>
                       <span className="font-medium">{p.firstName} {p.lastName}</span>

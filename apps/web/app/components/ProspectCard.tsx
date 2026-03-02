@@ -23,7 +23,7 @@ export default function ProspectCard({ prospect, compact, onClick }: ProspectCar
         onClick={onClick}
         className="card-hover px-4 py-3 cursor-pointer flex items-center gap-3"
       >
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-electric shrink-0">
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-xs font-bold text-electric shrink-0">
           {getInitials(fullName)}
         </div>
         <div className="flex-1 min-w-0">
@@ -46,7 +46,7 @@ export default function ProspectCard({ prospect, compact, onClick }: ProspectCar
     >
       {/* Header */}
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-sm font-bold text-electric shrink-0">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-sm font-bold text-electric shrink-0">
           {getInitials(fullName)}
         </div>
         <div className="flex-1 min-w-0">

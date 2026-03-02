@@ -5,20 +5,22 @@
 /* ─── ScoutVision Design System ──────────────────────────────────── */
 
 :root {
-  --navy: #0A1833;
-  --navy-light: #0F2147;
-  --charcoal: #1A1F2E;
-  --charcoal-light: #23272F;
-  --electric: #00E6FF;
-  --electric-dim: #00B8CC;
-  --accent-green: #00FFB2;
-  --surface: #141925;
-  --surface-hover: #1C2235;
-  --border: #2A3040;
-  --border-light: #3A4050;
+  --navy: #0B1120;
+  --navy-light: #111827;
+  --charcoal: #14171E;
+  --charcoal-light: #1C2028;
+  --electric: #22C55E;
+  --electric-dim: #16A34A;
+  --accent-green: #10B981;
+  --silver: #94A3B8;
+  --silver-light: #CBD5E1;
+  --surface: #0F1319;
+  --surface-hover: #181D26;
+  --border: #252A34;
+  --border-light: #343A48;
   --text-primary: #F4F6FA;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
   --sidebar-width: 260px;
 }
 
@@ -126,7 +128,7 @@ body {
   }
 
   .glow-electric {
-    box-shadow: 0 0 20px rgba(0, 230, 255, 0.15), 0 0 40px rgba(0, 230, 255, 0.05);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15), 0 0 40px rgba(34, 197, 94, 0.05);
   }
 
   .glass {
@@ -268,8 +270,8 @@ body {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 230, 255, 0.2); }
-  50% { box-shadow: 0 0 16px 4px rgba(0, 230, 255, 0.1); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.2); }
+  50% { box-shadow: 0 0 16px 4px rgba(34, 197, 94, 0.1); }
 }
 
 .animate-fade-in {

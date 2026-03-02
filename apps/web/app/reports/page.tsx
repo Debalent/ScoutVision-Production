@@ -343,7 +343,7 @@ function ReportGenerator({ onClose }: { onClose: () => void }) {
                         isSelected ? 'border-electric/30 bg-electric/5' : 'border-white/5 hover:border-white/10'
                       )}
                     >
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-[10px] font-bold text-electric">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-electric">
                         {getInitials(`${prospect.firstName} ${prospect.lastName}`)}
                       </div>
                       <div className="flex-1 min-w-0">

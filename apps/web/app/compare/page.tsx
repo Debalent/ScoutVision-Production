@@ -103,7 +103,7 @@ export default function ComparePage() {
                 onClick={() => { setSelectorSlot(idx); setShowSelector(true); }}
                 className="inline-block hover:scale-105 transition-transform"
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-lg font-bold text-electric mx-auto mb-3">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-lg font-bold text-electric mx-auto mb-3">
                   {getInitials(`${prospect.firstName} ${prospect.lastName}`)}
                 </div>
               </button>
@@ -205,7 +205,7 @@ export default function ComparePage() {
                 <div key={prospect.id} className={cn('rounded-xl border p-4', colors[i])}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-[10px] font-bold text-electric">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-electric">
                         {getInitials(`${prospect.firstName} ${prospect.lastName}`)}
                       </div>
                       <div>
@@ -251,7 +251,7 @@ export default function ComparePage() {
                       isSelected ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/5 cursor-pointer'
                     )}
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-electric/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-electric">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-xs font-bold text-electric">
                       {getInitials(`${prospect.firstName} ${prospect.lastName}`)}
                     </div>
                     <div className="flex-1 min-w-0">

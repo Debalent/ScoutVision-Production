@@ -199,7 +199,7 @@ export default function UploadDropzone({ onUploadComplete, prospectId, accept, m
                           'h-full rounded-full transition-all duration-300',
                           item.status === 'processing'
                             ? 'bg-amber-400 animate-pulse'
-                            : 'bg-gradient-to-r from-electric to-cyan-400'
+                            : 'bg-gradient-to-r from-electric to-emerald-400'
                         )}
                         style={{ width: `${item.progress}%` }}
                       />

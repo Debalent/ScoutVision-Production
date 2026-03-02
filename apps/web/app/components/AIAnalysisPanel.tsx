@@ -145,7 +145,7 @@ export default function AIAnalysisPanel({ videoId }: { videoId: string }) {
           </div>
           <div className="h-2 bg-charcoal rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-electric to-cyan-400 rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-electric to-emerald-400 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${job.progress}%` }}
             />
           </div>
