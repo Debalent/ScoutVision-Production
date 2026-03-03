@@ -36,12 +36,14 @@ export default function Sidebar() {
       )}>
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/5">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo.png"
-          alt="Scout Vision"
-          className="w-full max-w-[200px] h-auto object-contain mx-auto"
-        />
+        <div className="bg-white/10 rounded-xl p-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png?v=3"
+            alt="Scout Vision"
+            className="w-full max-w-[200px] h-auto object-contain mx-auto"
+          />
+        </div>
       </div>
 
       {/* Navigation */}
