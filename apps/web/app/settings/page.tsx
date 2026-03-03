@@ -64,15 +64,15 @@ export default function SettingsPage() {
         <p className="text-sm text-gray-500 mt-1">Manage your program configuration</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Settings Navigation */}
-        <div className="w-56 shrink-0">
-          <nav className="space-y-1">
+        <div className="w-full lg:w-56 shrink-0">
+          <nav className="flex lg:flex-col gap-1 overflow-x-auto pb-2 lg:pb-0">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors ${
+                className={`w-full flex items-center gap-2 lg:gap-3 px-3 py-2.5 text-sm rounded-lg transition-colors whitespace-nowrap ${
                   activeTab === tab.key
                     ? 'bg-electric-600/10 text-electric-400'
                     : 'text-gray-400 hover:bg-white/5 hover:text-white'
@@ -97,7 +97,7 @@ export default function SettingsPage() {
                 <p className="text-sm text-gray-400 mt-1">Configure your recruiting program details</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Program Name</label>
                   <input type="text" value={programName} onChange={(e) => setProgramName(e.target.value)} className="input-field w-full" />
@@ -259,12 +259,14 @@ export default function SettingsPage() {
               <div className="card p-6">
                 <h3 className="text-base font-semibold text-white mb-3">API Access</h3>
                 <p className="text-sm text-gray-400 mb-4">Use our API to build custom integrations</p>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-black/30 rounded-lg px-4 py-2.5 font-mono text-sm text-gray-400 border border-white/5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="flex-1 bg-black/30 rounded-lg px-4 py-2.5 font-mono text-sm text-gray-400 border border-white/5 truncate">
                     sv_live_••••••••••••••••••••••••
                   </div>
-                  <button className="btn-secondary text-sm">Regenerate</button>
-                  <button className="btn-secondary text-sm">Copy</button>
+                  <div className="flex gap-2 shrink-0">
+                    <button className="btn-secondary text-sm flex-1 sm:flex-none">Regenerate</button>
+                    <button className="btn-secondary text-sm flex-1 sm:flex-none">Copy</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -305,9 +307,9 @@ export default function SettingsPage() {
                   <h3 className="font-medium text-white mb-3">{section.category}</h3>
                   <div className="space-y-2">
                     {section.items.map((item) => (
-                      <div key={item.label} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white/[0.02]">
+                      <div key={item.label} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2 px-3 rounded-lg hover:bg-white/[0.02]">
                         <span className="text-sm text-gray-300">{item.label}</span>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 shrink-0">
                           {['Email', 'Push', 'In-App'].map((channel, i) => {
                             const enabled = i === 0 ? item.email : i === 1 ? item.push : item.inApp;
                             return (
@@ -332,15 +334,15 @@ export default function SettingsPage() {
           {activeTab === 'billing' && (
             <div className="space-y-4">
               <div className="card p-6">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                   <div>
                     <h2 className="text-lg font-semibold text-white">Current Plan</h2>
                     <p className="text-sm text-gray-400 mt-1">Manage your subscription</p>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-electric-600/20 text-electric-400 text-sm font-medium">Elite Plan</span>
+                  <span className="px-3 py-1 rounded-full bg-electric-600/20 text-electric-400 text-sm font-medium self-start sm:self-auto">Elite Plan</span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
                     { plan: 'Starter', price: '$99', period: '/mo', features: ['Up to 100 prospects', 'Basic CRM', 'Email tracking', 'Compliance calendar'], current: false },
                     { plan: 'Growth', price: '$249', period: '/mo', features: ['Up to 500 prospects', 'AI analysis (10/mo)', 'Video scouting', 'Advanced reports', 'Team collaboration'], current: false },
@@ -376,7 +378,7 @@ export default function SettingsPage() {
 
               <div className="card p-6">
                 <h3 className="text-base font-semibold text-white mb-4">Usage This Month</h3>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
                     { label: 'Prospects', used: 342, limit: 'Unlimited', pct: 0 },
                     { label: 'AI Analyses', used: 47, limit: 'Unlimited', pct: 0 },
@@ -409,7 +411,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-white/5 bg-white/[0.02]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-white/5 bg-white/[0.02]">
                     <div>
                       <div className="font-medium text-white text-sm">Two-Factor Authentication</div>
                       <p className="text-xs text-gray-400 mt-0.5">Add an extra layer of security to your account</p>
@@ -417,7 +419,7 @@ export default function SettingsPage() {
                     <button className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500/10 text-green-400">Enabled</button>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-white/5 bg-white/[0.02]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-white/5 bg-white/[0.02]">
                     <div>
                       <div className="font-medium text-white text-sm">Single Sign-On (SSO)</div>
                       <p className="text-xs text-gray-400 mt-0.5">Use your university credentials to sign in</p>
@@ -425,7 +427,7 @@ export default function SettingsPage() {
                     <button className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 text-gray-300 hover:bg-white/10">Configure</button>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-white/5 bg-white/[0.02]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-white/5 bg-white/[0.02]">
                     <div>
                       <div className="font-medium text-white text-sm">Session Management</div>
                       <p className="text-xs text-gray-400 mt-0.5">Auto-logout after 30 minutes of inactivity</p>
@@ -438,7 +440,7 @@ export default function SettingsPage() {
                     </select>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-white/5 bg-white/[0.02]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border border-white/5 bg-white/[0.02]">
                     <div>
                       <div className="font-medium text-white text-sm">IP Allowlist</div>
                       <p className="text-xs text-gray-400 mt-0.5">Restrict access to specific IP ranges</p>
@@ -481,13 +483,13 @@ export default function SettingsPage() {
                     { action: 'Export generated', user: 'Mike Johnson', time: '2 hours ago' },
                     { action: 'Settings updated', user: 'Coach Rivera', time: '1 day ago' },
                   ].map((log, i) => (
-                    <div key={i} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white/[0.02]">
-                      <div className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-electric-400" />
-                        <span className="text-gray-300">{log.action}</span>
-                        <span className="text-gray-500">by {log.user}</span>
+                    <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 py-2 px-3 rounded-lg hover:bg-white/[0.02]">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-1.5 h-1.5 rounded-full bg-electric-400 shrink-0" />
+                        <span className="text-gray-300 truncate">{log.action}</span>
+                        <span className="text-gray-500 shrink-0">by {log.user}</span>
                       </div>
-                      <span className="text-gray-500 text-xs">{log.time}</span>
+                      <span className="text-gray-500 text-xs shrink-0 pl-4 sm:pl-0">{log.time}</span>
                     </div>
                   ))}
                 </div>
