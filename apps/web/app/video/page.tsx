@@ -168,7 +168,7 @@ function VideoLibrary({ search, setSearch }: { search: string; setSearch: (s: st
 
                 {/* AI Metrics */}
                 {video.aiMetrics && (
-                  <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
                     {Object.entries(video.aiMetrics).map(([key, val]) => (
                       <div key={key} className="rounded-lg bg-white/[0.03] py-1.5">
                         <p className="text-[10px] text-gray-500 uppercase">{key.replace(/_/g, ' ')}</p>

@@ -80,9 +80,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className + ' bg-navy text-white min-h-screen antialiased'}>
         <SidebarProvider>
           <Sidebar />
-          <main className="lg:ml-[260px] min-h-screen transition-[margin] duration-200">
+          <main className="lg:ml-[260px] min-h-screen transition-[margin] duration-200 relative z-10">
             <TopBar />
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
               {children}
             </div>
           </main>

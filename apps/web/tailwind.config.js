@@ -97,8 +97,10 @@ module.exports = {
         glow: '0 0 20px rgba(34, 197, 94, 0.15), 0 0 40px rgba(34, 197, 94, 0.05)',
         'glow-sm': '0 0 10px rgba(34, 197, 94, 0.1)',
         'glow-lg': '0 0 30px rgba(34, 197, 94, 0.2), 0 0 60px rgba(34, 197, 94, 0.08)',
-        card: '0 4px 24px rgba(0, 0, 0, 0.2)',
-        'card-hover': '0 8px 32px rgba(0, 0, 0, 0.35)',
+        'glow-xl': '0 0 50px rgba(34, 197, 94, 0.15), 0 0 100px rgba(34, 197, 94, 0.06)',
+        card: '0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+        'card-hover': '0 8px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(34, 197, 94, 0.06)',
+        'card-elevated': '0 12px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
       },
       backgroundImage: {
         'gradient-electric': 'linear-gradient(135deg, #22C55E, #16A34A)',

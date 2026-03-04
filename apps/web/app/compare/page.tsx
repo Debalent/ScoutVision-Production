@@ -69,7 +69,7 @@ export default function ComparePage() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="page-title">Prospect Comparison</h1>
           <p className="text-sm text-gray-500 mt-1">Side-by-side evaluation of {selectedProspects.length} prospects</p>
@@ -84,62 +84,64 @@ export default function ComparePage() {
 
       {/* Prospect Headers */}
       <div className="card overflow-hidden">
-        <div className="grid" style={{ gridTemplateColumns: `200px repeat(${selectedProspects.length}, 1fr)` }}>
-          {/* Empty corner */}
-          <div className="p-4 border-b border-r border-white/5 bg-white/[0.02]" />
-          {/* Prospect cards */}
-          {selectedProspects.map((prospect, idx) => (
-            <div key={prospect.id} className="p-5 border-b border-r border-white/5 last:border-r-0 text-center relative group">
-              {selectedIds.length > 2 && (
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[600px]" style={{ gridTemplateColumns: `160px repeat(${selectedProspects.length}, minmax(180px, 1fr))` }}>
+            {/* Empty corner */}
+            <div className="p-4 border-b border-r border-white/5 bg-white/[0.02]" />
+            {/* Prospect cards */}
+            {selectedProspects.map((prospect, idx) => (
+              <div key={prospect.id} className="p-5 border-b border-r border-white/5 last:border-r-0 text-center relative group">
+                {selectedIds.length > 2 && (
+                  <button
+                    onClick={() => removeSlot(idx)}
+                    title="Remove prospect"
+                    className="absolute top-2 right-2 p-1 rounded-lg bg-white/5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                  </button>
+                )}
                 <button
-                  onClick={() => removeSlot(idx)}
-                  title="Remove prospect"
-                  className="absolute top-2 right-2 p-1 rounded-lg bg-white/5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                  onClick={() => { setSelectorSlot(idx); setShowSelector(true); }}
+                  className="inline-block hover:scale-105 transition-transform"
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
-                </button>
-              )}
-              <button
-                onClick={() => { setSelectorSlot(idx); setShowSelector(true); }}
-                className="inline-block hover:scale-105 transition-transform"
-              >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-lg font-bold text-electric mx-auto mb-3">
-                  {getInitials(`${prospect.firstName} ${prospect.lastName}`)}
-                </div>
-              </button>
-              <h3 className="text-base font-bold">{prospect.firstName} {prospect.lastName}</h3>
-              <p className="text-sm text-electric font-medium">{prospect.position}</p>
-              <p className="text-xs text-gray-500 mt-1">{prospect.highSchool}</p>
-              <p className="text-xs text-gray-500">{prospect.city}, {prospect.state}</p>
-              <div className="flex items-center justify-center gap-2 mt-3">
-                <span className="text-xs text-gray-500">{prospect.height} / {prospect.weight} lbs</span>
-              </div>
-              {prospect.commitmentScore !== null && (
-                <div className="mt-3">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/5">
-                    <span className="text-xs text-gray-400">Score</span>
-                    <span className={cn(
-                      'text-sm font-bold',
-                      prospect.commitmentScore >= 75 ? 'text-emerald-400' :
-                      prospect.commitmentScore >= 50 ? 'text-amber-400' : 'text-red-400'
-                    )}>
-                      {prospect.commitmentScore}%
-                    </span>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-lg font-bold text-electric mx-auto mb-3">
+                    {getInitials(`${prospect.firstName} ${prospect.lastName}`)}
                   </div>
+                </button>
+                <h3 className="text-sm sm:text-base font-bold">{prospect.firstName} {prospect.lastName}</h3>
+                <p className="text-xs sm:text-sm text-electric font-medium">{prospect.position}</p>
+                <p className="text-xs text-gray-500 mt-1">{prospect.highSchool}</p>
+                <p className="text-xs text-gray-500">{prospect.city}, {prospect.state}</p>
+                <div className="flex items-center justify-center gap-2 mt-3">
+                  <span className="text-xs text-gray-500">{prospect.height} / {prospect.weight} lbs</span>
                 </div>
-              )}
-            </div>
-          ))}
+                {prospect.commitmentScore !== null && (
+                  <div className="mt-3">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/5">
+                      <span className="text-xs text-gray-400">Score</span>
+                      <span className={cn(
+                        'text-sm font-bold',
+                        prospect.commitmentScore >= 75 ? 'text-emerald-400' :
+                        prospect.commitmentScore >= 50 ? 'text-amber-400' : 'text-red-400'
+                      )}>
+                        {prospect.commitmentScore}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Section Tabs */}
-        <div className="flex items-center gap-1 p-2 border-b border-white/5 bg-white/[0.02]">
+        <div className="flex items-center gap-1 p-2 border-b border-white/5 bg-white/[0.02] overflow-x-auto">
           {(['athletic', 'academic', 'recruiting'] as const).map((section) => (
             <button
               key={section}
               onClick={() => setActiveSection(section)}
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all',
+                'px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all whitespace-nowrap',
                 activeSection === section ? 'bg-electric/10 text-electric' : 'text-gray-400 hover:text-white'
               )}
             >
@@ -149,21 +151,23 @@ export default function ComparePage() {
         </div>
 
         {/* Metrics Comparison */}
-        <ComparisonTable
-          prospects={selectedProspects}
-          metrics={
-            activeSection === 'athletic' ? ATHLETIC_METRICS :
-            activeSection === 'academic' ? ACADEMIC_METRICS :
-            RECRUITING_METRICS
-          }
-        />
+        <div className="overflow-x-auto">
+          <ComparisonTable
+            prospects={selectedProspects}
+            metrics={
+              activeSection === 'athletic' ? ATHLETIC_METRICS :
+              activeSection === 'academic' ? ACADEMIC_METRICS :
+              RECRUITING_METRICS
+            }
+          />
+        </div>
       </div>
 
       {/* Radar Chart Placeholder */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card p-6">
           <h3 className="section-title mb-4">Athletic Profile Comparison</h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {ATHLETIC_METRICS.map((metric) => {
               const values = selectedProspects.map((p) => Number(metric.getValue(p)) || 0);
               const maxVal = Math.max(...values, 1);
@@ -274,7 +278,7 @@ export default function ComparePage() {
 
 function ComparisonTable({ prospects, metrics }: { prospects: Prospect[]; metrics: CompareMetric[] }) {
   return (
-    <div>
+    <div className="min-w-[600px]">
       {metrics.map((metric, i) => {
         const values = prospects.map((p) => metric.getValue(p));
         const numericValues = values.filter((v) => typeof v === 'number') as number[];
@@ -289,18 +293,18 @@ function ComparisonTable({ prospects, metrics }: { prospects: Prospect[]; metric
               'grid border-b border-white/5 last:border-b-0',
               i % 2 === 0 ? 'bg-transparent' : 'bg-white/[0.01]'
             )}
-            style={{ gridTemplateColumns: `200px repeat(${prospects.length}, 1fr)` }}
+            style={{ gridTemplateColumns: `160px repeat(${prospects.length}, minmax(180px, 1fr))` }}
           >
-            <div className="px-4 py-3 flex items-center text-sm text-gray-400 font-medium border-r border-white/5">
+            <div className="px-3 sm:px-4 py-3 flex items-center text-xs sm:text-sm text-gray-400 font-medium border-r border-white/5">
               {metric.label}
             </div>
             {prospects.map((prospect) => {
               const val = metric.getValue(prospect);
               const isBest = best !== null && val === best;
               return (
-                <div key={prospect.id} className="px-4 py-3 flex items-center justify-center border-r border-white/5 last:border-r-0">
+                <div key={prospect.id} className="px-3 sm:px-4 py-3 flex items-center justify-center border-r border-white/5 last:border-r-0">
                   <span className={cn(
-                    'text-sm font-medium',
+                    'text-xs sm:text-sm font-medium',
                     isBest ? 'text-emerald-400 font-bold' : 'text-gray-300'
                   )}>
                     {val ?? '—'}

@@ -43,8 +43,8 @@ export default function TopBar() {
   const { toggle } = useSidebar();
 
   return (
-    <div className="sticky top-0 z-30 bg-navy/80 backdrop-blur-xl border-b border-white/5">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3 sm:gap-4">
+    <div className="sticky top-0 z-30 border-b border-white/[0.06]" style={{ background: 'rgba(11, 17, 32, 0.85)', backdropFilter: 'blur(20px) saturate(180%)' }}>
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 sm:gap-4">
         {/* Mobile menu toggle */}
         <button
           onClick={toggle}
@@ -63,7 +63,7 @@ export default function TopBar() {
               setSearchOpen(true);
               setTimeout(() => searchRef.current?.focus(), 50);
             }}
-            className="w-full flex items-center gap-3 px-4 py-2 rounded-xl bg-white/[0.04] border border-white/5 text-sm text-gray-500 hover:border-white/10 hover:bg-white/[0.06] transition-all"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm text-gray-500 hover:border-white/10 hover:bg-white/[0.05] transition-all duration-200"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
@@ -99,7 +99,7 @@ export default function TopBar() {
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-xl hover:bg-white/5 transition-all"
             >
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-electric/30 to-emerald-500/30 flex items-center justify-center text-[10px] font-bold text-electric">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-electric/30 to-emerald-500/30 flex items-center justify-center text-[10px] font-bold text-electric ring-2 ring-electric/10">
                 CR
               </div>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
@@ -108,7 +108,7 @@ export default function TopBar() {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-charcoal border border-white/10 shadow-2xl overflow-hidden animate-scale-in">
+              <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-white/[0.08] shadow-2xl overflow-hidden animate-scale-in" style={{ background: 'linear-gradient(145deg, #1C2028, #14171E)' }}>
                 <div className="px-4 py-3 border-b border-white/5">
                   <p className="text-sm font-medium">Coach Rivera</p>
                   <p className="text-xs text-gray-500">rivera@university.edu</p>
@@ -141,10 +141,11 @@ export default function TopBar() {
 
       {/* Command Palette / Search Modal */}
       {searchOpen && (
-        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-start justify-center pt-[15vh]" onClick={() => setSearchOpen(false)}>
+        <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-start justify-center pt-[12vh]" onClick={() => setSearchOpen(false)}>
           <div
-            className="w-full max-w-xl bg-charcoal border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-scale-in"
+            className="w-full max-w-xl border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
+            style={{ background: 'linear-gradient(145deg, #1C2028, #14171E)' }}
           >
             {/* Search Input */}
             <div className="flex items-center gap-3 px-5 h-14 border-b border-white/5">

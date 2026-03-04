@@ -205,7 +205,7 @@ export default function SettingsPage() {
 
               <div className="card p-6">
                 <h3 className="text-base font-semibold text-white mb-3">Role Permissions</h3>
-                <div className="grid grid-cols-4 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                   {['Admin', 'Coach', 'Analyst', 'Assistant'].map((role) => (
                     <div key={role} className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
                       <div className="font-medium text-white mb-2">{role}</div>

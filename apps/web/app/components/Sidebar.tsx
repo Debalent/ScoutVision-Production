@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { useSidebar } from './SidebarContext';
@@ -30,24 +31,26 @@ export default function Sidebar() {
         />
       )}
       <aside className={cn(
-        'fixed left-0 top-0 bottom-0 w-[260px] bg-charcoal border-r border-white/5 flex flex-col z-50 transition-transform duration-200 ease-in-out',
+        'fixed left-0 top-0 bottom-0 w-[260px] border-r border-white/[0.06] flex flex-col z-50 transition-transform duration-200 ease-in-out',
         'lg:translate-x-0',
         open ? 'translate-x-0' : '-translate-x-full'
-      )}>
+      )} style={{ background: 'linear-gradient(180deg, #16191F 0%, #0F1219 100%)' }}>
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-white/5">
-        <div className="bg-white/10 rounded-xl p-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/logo.png?v=3"
+      <div className="px-5 py-5 border-b border-white/[0.06]">
+        <div className="bg-white/[0.04] rounded-xl p-3 border border-white/[0.04]">
+          <Image
+            src="/logo.png"
             alt="Scout Vision"
+            width={200}
+            height={50}
             className="w-full max-w-[200px] h-auto object-contain mx-auto"
+            priority
           />
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-5 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
           return (
@@ -56,12 +59,15 @@ export default function Sidebar() {
               href={item.href}
               onClick={close}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative',
                 isActive
-                  ? 'bg-electric/10 text-electric shadow-sm'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-electric/[0.08] text-electric'
+                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
               )}
             >
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-electric" />
+              )}
               <item.icon active={isActive} />
               {item.label}
               {isActive && (
@@ -73,20 +79,24 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom section */}
-      <div className="px-3 pb-4 space-y-2">
-        <div className="card px-4 py-3">
+      <div className="px-3 pb-4 space-y-3">
+        <div className="border-t border-white/[0.06] pt-3" />
+        <div className="rounded-xl px-4 py-3 bg-white/[0.03] border border-white/[0.05]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-xs font-bold text-electric">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-xs font-bold text-electric ring-2 ring-electric/10">
               CR
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">Coach Rivera</p>
               <p className="text-xs text-gray-500">Head Coach</p>
             </div>
+            <button className="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all" title="Account settings" aria-label="Account settings">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m18 15-6-6-6 6"/></svg>
+            </button>
           </div>
         </div>
         <div className="px-3 py-2 flex items-center gap-2 text-xs text-gray-600">
-          <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
           <span>Growth Plan · 4 seats</span>
         </div>
       </div>
