@@ -109,7 +109,7 @@ export default function NotificationCenter() {
       {open && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-3 w-96 card p-0 z-40 animate-scale-in max-h-[480px] overflow-hidden flex flex-col shadow-card-elevated">
+          <div className="fixed inset-x-3 top-16 z-40 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-3 w-auto sm:w-96 card p-0 animate-scale-in max-h-[480px] overflow-hidden flex flex-col shadow-card-elevated">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
               <span className="text-sm font-semibold text-white">Notifications</span>
