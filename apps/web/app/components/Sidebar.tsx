@@ -60,10 +60,10 @@ export default function Sidebar() {
               href={item.href}
               onClick={close}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ease-out group relative',
                 isActive
-                  ? 'bg-electric/[0.08] text-electric'
-                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-electric/[0.08] text-electric shadow-[inset_0_0_0_1px_rgba(34,197,94,0.12)]'
+                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04] active:scale-[0.98]'
               )}
             >
               {isActive && (

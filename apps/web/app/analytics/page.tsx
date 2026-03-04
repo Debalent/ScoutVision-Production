@@ -98,7 +98,7 @@ function PipelineFunnel() {
                 </div>
                 {i < stageData.length - 1 && (
                   <div className="flex justify-center">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600">
                       <path d="m7 7 5 5 5-5" />
                     </svg>
                   </div>
@@ -292,21 +292,21 @@ function PositionFill() {
 
       {/* Position Summary Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Positions Filled</p>
           <p className="stat-value text-emerald-400">
             {positionMetrics.filter((m) => m.value >= ((m.metadata as { target: number })?.target ?? 0)).length}
           </p>
         </div>
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Total Committed</p>
           <p className="stat-value">{positionMetrics.reduce((sum, m) => sum + m.value, 0)}</p>
         </div>
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Total Targets</p>
           <p className="stat-value">{positionMetrics.reduce((sum, m) => sum + ((m.metadata as { target: number })?.target ?? 0), 0)}</p>
         </div>
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Fill Rate</p>
           <p className="stat-value text-electric">
             {pct(
@@ -371,7 +371,7 @@ function PredictiveView() {
         <div className="card p-6 border-electric/10 glow-electric">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-electric/10 flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-electric">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-electric">
                 <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22" />
                 <path d="M12 2a4 4 0 0 0-4 4c0 1.95 1.4 3.58 3.25 3.93" />
                 <path d="M8.56 14h6.88" /><path d="M9.44 17.5h5.12" />
@@ -385,19 +385,19 @@ function PredictiveView() {
 
           <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
             <div className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-              <p className="font-medium text-white mb-1">🎯 High-Priority Action</p>
+              <p className="font-medium text-white mb-1 flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-rose-400 shrink-0"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> High-Priority Action</p>
               <p>DeAndre Williams (85% commit score) has not been contacted in 5 days. Schedule follow-up to maintain momentum.</p>
             </div>
             <div className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-              <p className="font-medium text-white mb-1">📈 Trending Up</p>
+              <p className="font-medium text-white mb-1 flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400 shrink-0"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Trending Up</p>
               <p>Marcus Johnson's engagement increased 23% after his campus visit. Academic profile meets eligibility threshold.</p>
             </div>
             <div className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-              <p className="font-medium text-white mb-1">⚠️ At Risk</p>
+              <p className="font-medium text-white mb-1 flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400 shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> At Risk</p>
               <p>Andre Davis's academic standing (2.7 GPA) may affect NCAA eligibility. Consider academic support outreach.</p>
             </div>
             <div className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-              <p className="font-medium text-white mb-1">🗺️ Geographic Gap</p>
+              <p className="font-medium text-white mb-1 flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg> Geographic Gap</p>
               <p>West region producing only 8% pipeline yield. Increase camp presence in CA, NV, and CO markets.</p>
             </div>
           </div>

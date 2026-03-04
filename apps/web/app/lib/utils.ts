@@ -69,15 +69,15 @@ export function periodColor(type: string): { bg: string; text: string; border: s
   }
 }
 
-/** Activity type icon mapping */
-export function activityIcon(type: string): string {
+/** Activity type icon & color mapping */
+export function activityIcon(type: string): { icon: string; color: string } {
   switch (type) {
-    case 'note': return '📝';
-    case 'email': return '✉️';
-    case 'evaluation': return '⭐';
-    case 'visit': return '🏟️';
-    case 'stage_change': return '📊';
-    case 'compliance': return '🛡️';
-    default: return '📌';
+    case 'note': return { icon: 'note', color: 'text-blue-400' };
+    case 'email': return { icon: 'email', color: 'text-violet-400' };
+    case 'evaluation': return { icon: 'star', color: 'text-amber-400' };
+    case 'visit': return { icon: 'visit', color: 'text-emerald-400' };
+    case 'stage_change': return { icon: 'stage', color: 'text-cyan-400' };
+    case 'compliance': return { icon: 'shield', color: 'text-red-400' };
+    default: return { icon: 'pin', color: 'text-gray-400' };
   }
 }

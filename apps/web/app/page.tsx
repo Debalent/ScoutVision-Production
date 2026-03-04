@@ -51,7 +51,7 @@ export default function DashboardPage() {
           trend="up"
           accent="electric"
           icon={
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           }
         />
         <StatCard
@@ -61,7 +61,7 @@ export default function DashboardPage() {
           trend="up"
           accent="emerald"
           icon={
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
           }
         />
         <StatCard
@@ -69,7 +69,7 @@ export default function DashboardPage() {
           value={DASHBOARD_STATS.upcomingVisits}
           accent="purple"
           icon={
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           }
         />
         <StatCard
@@ -79,7 +79,7 @@ export default function DashboardPage() {
           trend="neutral"
           accent="amber"
           icon={
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           }
         />
       </div>
@@ -91,7 +91,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-electric/10 flex items-center justify-center">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-electric" strokeLinecap="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-electric" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/>
                 </svg>
               </div>
@@ -109,7 +109,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400" strokeLinecap="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-400" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
                   </svg>
                 </div>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
           <div className="card p-5">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-400" strokeLinecap="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-400" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>
               </div>
@@ -163,7 +163,7 @@ export default function DashboardPage() {
         <div className="card p-6">
           <div className="flex items-center gap-2.5 mb-5">
             <div className="w-8 h-8 rounded-lg bg-electric/10 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-electric" strokeLinecap="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-electric" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
               </svg>
             </div>
@@ -205,7 +205,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-400" strokeLinecap="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-400" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
               </div>
@@ -222,13 +222,21 @@ export default function DashboardPage() {
       </div>
 
       {/* AI Insights Panel */}
-      <div className="card-glow p-6 border-electric/10 relative overflow-hidden">
-        {/* Decorative gradient */}
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-electric/30 to-transparent" />
-        <div className="absolute -top-20 -left-20 w-60 h-60 rounded-full bg-electric/[0.04] blur-3xl" />
-        
-        <div className="relative z-10 flex items-start gap-4">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-electric/20 to-emerald-500/10 flex items-center justify-center shrink-0 animate-float">
+      <div className="relative rounded-2xl border border-electric/[0.12] overflow-hidden group/ai transition-all duration-300 hover:border-electric/20"
+        style={{
+          background: 'linear-gradient(145deg, rgba(28, 32, 40, 0.95), rgba(20, 23, 30, 0.98))',
+          boxShadow: '0 0 30px rgba(34, 197, 94, 0.06), 0 4px 24px rgba(0, 0, 0, 0.2)',
+        }}
+      >
+        {/* Top gradient line */}
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-electric/40 to-transparent" />
+        {/* Ambient glow blobs */}
+        <div className="absolute -top-20 -left-20 w-60 h-60 rounded-full bg-electric/[0.04] blur-3xl transition-opacity group-hover/ai:opacity-100 opacity-60" />
+        <div className="absolute -bottom-16 -right-16 w-48 h-48 rounded-full bg-emerald-500/[0.03] blur-3xl" />
+
+        <div className="relative z-10 p-6 flex items-start gap-4">
+          {/* Animated AI icon */}
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-electric/20 to-emerald-500/10 flex items-center justify-center shrink-0 animate-float border border-electric/10 group-hover/ai:border-electric/20 transition-colors">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-electric">
               <path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22" />
               <path d="M12 2a4 4 0 0 0-4 4c0 1.95 1.4 3.58 3.25 3.93" />
@@ -236,10 +244,20 @@ export default function DashboardPage() {
               <path d="M9.44 17.5h5.12" />
             </svg>
           </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-sm font-semibold text-electric">AI Insights</h3>
-              <span className="badge-electric text-[10px] animate-pulse-glow">Live</span>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-3">
+              <h3 className="text-sm font-semibold text-electric tracking-tight">AI Insights</h3>
+              {/* Live indicator with pulsing dot */}
+              <div className="flex items-center gap-1.5 bg-electric/[0.08] border border-electric/[0.15] px-2.5 py-1 rounded-full">
+                <div className="w-2 h-2 rounded-full bg-electric animate-live-pulse" />
+                <span className="text-[10px] font-semibold text-electric uppercase tracking-wider">Live</span>
+              </div>
+              {/* Refresh button */}
+              <button className="ml-auto p-1.5 rounded-lg text-gray-500 hover:text-electric hover:bg-electric/5 transition-all duration-150 active:scale-95" aria-label="Refresh insights">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" /><path d="M16 16h5v5" />
+                </svg>
+              </button>
             </div>
             <p className="text-sm text-gray-300 leading-relaxed">
               Based on your pipeline data, <span className="text-white font-medium">DeAndre Williams</span> shows
@@ -249,6 +267,15 @@ export default function DashboardPage() {
               <span className="text-white font-medium"> S </span> positions — current class is
               below target fill rate.
             </p>
+            {/* Quick action chips */}
+            <div className="flex flex-wrap gap-2 mt-4">
+              <button className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-electric/[0.06] text-electric border border-electric/10 hover:bg-electric/10 hover:border-electric/20 transition-all duration-150 active:scale-[0.97]">
+                View DeAndre Williams →
+              </button>
+              <button className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-white/[0.03] text-gray-400 border border-white/[0.06] hover:bg-white/[0.06] hover:text-white transition-all duration-150 active:scale-[0.97]">
+                Position Needs Report
+              </button>
+            </div>
           </div>
         </div>
       </div>

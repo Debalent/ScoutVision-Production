@@ -33,19 +33,19 @@ export default function CompliancePage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Active Alerts</p>
           <p className="stat-value text-amber-400">{unresolvedCount}</p>
         </div>
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Warnings</p>
           <p className="stat-value text-amber-400">{warningCount}</p>
         </div>
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Violations</p>
           <p className="stat-value text-red-400">{violationCount}</p>
         </div>
-        <div className="card px-5 py-4">
+        <div className="card card-hover px-5 py-4">
           <p className="stat-label">Current Period</p>
           <p className="stat-value text-emerald-400 text-xl">Contact</p>
         </div>
@@ -173,7 +173,7 @@ function CalendarView() {
       {/* Upcoming Dead Periods Warning */}
       <div className="card p-5 border-red-500/10">
         <h3 className="text-sm font-semibold text-red-400 mb-3 flex items-center gap-2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-400">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
             <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
             <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>

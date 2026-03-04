@@ -108,7 +108,7 @@ function VideoLibrary({ search, setSearch }: { search: string; setSearch: (s: st
         {filteredVideos.map((video) => {
           const prospect = PROSPECTS.find((p) => p.id === video.prospectId);
           return (
-            <div key={video.id} className="card card-hover p-0 overflow-hidden">
+            <div key={video.id} className="card card-hover p-0 overflow-hidden group/video">
               {/* Video Thumbnail */}
               <div className="relative h-48 bg-navy/80 flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-navy/90 to-transparent z-10" />
@@ -116,11 +116,39 @@ function VideoLibrary({ search, setSearch }: { search: string; setSearch: (s: st
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
                 {/* Play overlay */}
-                <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
-                  <div className="w-14 h-14 rounded-full bg-electric/20 backdrop-blur-md flex items-center justify-center border border-electric/30">
+                <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover/video:opacity-100 transition-opacity duration-200 cursor-pointer">
+                  <div className="w-14 h-14 rounded-full bg-electric/20 backdrop-blur-md flex items-center justify-center border border-electric/30 transition-transform duration-150 hover:scale-110 active:scale-95">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-electric ml-1">
                       <polygon points="5 3 19 12 5 21 5 3" />
                     </svg>
+                  </div>
+                </div>
+
+                {/* ─── Advanced Controls Strip (bottom) ─── */}
+                <div className="absolute bottom-0 left-0 right-0 z-20 opacity-0 group-hover/video:opacity-100 transition-opacity duration-200">
+                  {/* Progress bar */}
+                  <div className="h-1 bg-white/10 mx-3 mb-1 rounded-full overflow-hidden cursor-pointer group/progress">
+                    <div className="h-full w-[35%] bg-electric rounded-full transition-all group-hover/progress:h-1.5" />
+                  </div>
+                  <div className="flex items-center justify-between px-3 pb-2">
+                    <div className="flex items-center gap-1.5">
+                      {/* Frame back */}
+                      <button className="p-1 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all duration-150 active:scale-90" title="Previous frame" aria-label="Previous frame">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                      </button>
+                      {/* Play/Pause */}
+                      <button className="p-1 rounded text-white/80 hover:text-white hover:bg-white/10 transition-all duration-150 active:scale-90" title="Play" aria-label="Play">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-white"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                      </button>
+                      {/* Frame forward */}
+                      <button className="p-1 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all duration-150 active:scale-90" title="Next frame" aria-label="Next frame">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m12 5 7 7-7 7"/><path d="M5 12h14"/></svg>
+                      </button>
+                    </div>
+                    {/* Slow-mo indicator */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-mono text-white/50 bg-white/5 px-1.5 py-0.5 rounded">1.0×</span>
+                    </div>
                   </div>
                 </div>
                 {/* Status Badge */}
@@ -134,6 +162,20 @@ function VideoLibrary({ search, setSearch }: { search: string; setSearch: (s: st
                     {video.status === 'analyzed' ? 'AI Analyzed' : video.status === 'processing' ? 'Processing' : 'Uploaded'}
                   </span>
                 </div>
+
+                {/* AI Auto-Tag Overlay (analyzed only) */}
+                {video.status === 'analyzed' && (
+                  <div className="absolute top-3 left-3 z-20 flex flex-col gap-1">
+                    <span className="flex items-center gap-1 text-[9px] font-medium bg-black/60 backdrop-blur-sm text-emerald-400 px-1.5 py-0.5 rounded">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                      Pose Tracked
+                    </span>
+                    <span className="flex items-center gap-1 text-[9px] font-medium bg-black/60 backdrop-blur-sm text-sky-400 px-1.5 py-0.5 rounded">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      Auto-Tagged
+                    </span>
+                  </div>
+                )}
                 {/* Duration */}
                 {video.duration && (
                   <div className="absolute bottom-3 right-3 z-20">
@@ -197,6 +239,14 @@ function VideoLibrary({ search, setSearch }: { search: string; setSearch: (s: st
                     </a>
                   )}
                 </div>
+
+                {/* ─── Generate Report (placeholder) ─── */}
+                {video.status === 'analyzed' && (
+                  <button className="w-full mt-2 flex items-center justify-center gap-2 py-2 rounded-lg bg-electric/10 text-electric text-xs font-medium border border-electric/20 hover:bg-electric/20 transition-all duration-150 active:scale-[0.97]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                    Generate Report
+                  </button>
+                )}
               </div>
             </div>
           );
@@ -329,7 +379,7 @@ function UploadView({ onBack }: { onBack: () => void }) {
           </div>
           <div>
             <label className="text-sm text-gray-400 block mb-1.5">Link Prospect</label>
-            <select className="input">
+            <select className="input" title="Link prospect to video">
               <option value="">Select prospect...</option>
               {PROSPECTS.map((p) => (
                 <option key={p.id} value={p.id}>

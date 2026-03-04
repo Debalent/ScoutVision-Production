@@ -114,6 +114,10 @@ module.exports = {
         'slide-up': 'slideUp 0.3s ease-out forwards',
         'pulse-glow': 'pulse-glow 2s infinite',
         'scale-in': 'scaleIn 0.2s ease-out forwards',
+        'notification-in': 'notificationIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'toast-in': 'toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'toast-out': 'toastOut 0.2s ease-in forwards',
+        'live-pulse': 'livePulse 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -135,6 +139,22 @@ module.exports = {
         'pulse-glow': {
           '0%, 100%': { boxShadow: '0 0 0 0 rgba(34, 197, 94, 0.2)' },
           '50%': { boxShadow: '0 0 16px 4px rgba(34, 197, 94, 0.1)' },
+        },
+        notificationIn: {
+          from: { opacity: '0', transform: 'translateY(-8px) scale(0.96)' },
+          to: { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        toastIn: {
+          from: { opacity: '0', transform: 'translateX(100%) scale(0.95)' },
+          to: { opacity: '1', transform: 'translateX(0) scale(1)' },
+        },
+        toastOut: {
+          from: { opacity: '1', transform: 'translateX(0) scale(1)' },
+          to: { opacity: '0', transform: 'translateX(100%) scale(0.95)' },
+        },
+        livePulse: {
+          '0%, 100%': { opacity: '1', boxShadow: '0 0 0 0 rgba(34, 197, 94, 0.4)' },
+          '50%': { opacity: '0.7', boxShadow: '0 0 8px 3px rgba(34, 197, 94, 0.15)' },
         },
       },
       transitionDuration: {

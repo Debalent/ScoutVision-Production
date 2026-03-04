@@ -375,19 +375,19 @@ export default function ProspectProfilePage() {
       {activeTab === 'ai' && (
         <div className="space-y-4">
           <div className="grid grid-cols-4 gap-4">
-            <div className="card p-5 text-center">
+            <div className="card card-hover p-5 text-center">
               <div className="text-3xl font-bold text-electric-400">{p.aiReport.overallGrade}</div>
               <div className="text-xs text-gray-500 mt-1">AI Overall Grade</div>
             </div>
-            <div className="card p-5 text-center">
+            <div className="card card-hover p-5 text-center">
               <div className="text-3xl font-bold text-green-400">{p.aiReport.fitScore}</div>
               <div className="text-xs text-gray-500 mt-1">Program Fit</div>
             </div>
-            <div className="card p-5 text-center">
+            <div className="card card-hover p-5 text-center">
               <div className="text-3xl font-bold text-yellow-400">{p.aiReport.projections.ceiling}</div>
               <div className="text-xs text-gray-500 mt-1">Ceiling Projection</div>
             </div>
-            <div className="card p-5 text-center">
+            <div className="card card-hover p-5 text-center">
               <div className="text-3xl font-bold text-white">${(p.aiReport.nilEstimate.value / 1000).toFixed(0)}K</div>
               <div className="text-xs text-gray-500 mt-1">NIL Estimate</div>
             </div>
