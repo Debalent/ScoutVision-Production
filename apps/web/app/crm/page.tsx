@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { PROSPECTS, STAGES } from '../lib/mock-data';
+import { STAGES } from '../lib/mock-data';
+import { useProspects } from '../components/ProspectContext';
 import { cn, getInitials, formatDate } from '../lib/utils';
 import type { Prospect, RecruitingStage } from '../lib/types';
 import Link from 'next/link';
@@ -9,6 +10,7 @@ import Link from 'next/link';
 type ViewMode = 'board' | 'table';
 
 export default function CRMPage() {
+  const { prospects: PROSPECTS, openAddModal } = useProspects();
   const [view, setView] = useState<ViewMode>('board');
   const [search, setSearch] = useState('');
   const [positionFilter, setPositionFilter] = useState('all');
@@ -42,7 +44,7 @@ export default function CRMPage() {
               Export CSV
             </span>
           </button>
-          <button className="btn-primary text-sm">+ Add Prospect</button>
+          <button className="btn-primary text-sm" onClick={openAddModal}>+ Add Prospect</button>
         </div>
       </div>
 

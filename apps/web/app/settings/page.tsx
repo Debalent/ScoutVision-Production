@@ -2,26 +2,9 @@
 
 import { useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import { useTeam } from '../components/TeamContext';
 
 type SettingsTab = 'general' | 'team' | 'integrations' | 'notifications' | 'billing' | 'security';
-
-interface TeamMember {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar: string | null;
-  lastActive: string;
-  status: 'active' | 'invited' | 'disabled';
-}
-
-const MOCK_TEAM: TeamMember[] = [
-  { id: '1', name: 'Coach Rivera', email: 'rivera@university.edu', role: 'Admin', avatar: null, lastActive: '2024-01-15T10:30:00Z', status: 'active' },
-  { id: '2', name: 'Sarah Chen', email: 'chen@university.edu', role: 'Coach', avatar: null, lastActive: '2024-01-15T09:15:00Z', status: 'active' },
-  { id: '3', name: 'Mike Johnson', email: 'johnson@university.edu', role: 'Analyst', avatar: null, lastActive: '2024-01-14T16:45:00Z', status: 'active' },
-  { id: '4', name: 'Lisa Park', email: 'park@university.edu', role: 'Assistant', avatar: null, lastActive: '2024-01-13T11:00:00Z', status: 'active' },
-  { id: '5', name: 'David Brown', email: 'brown@university.edu', role: 'Coach', avatar: null, lastActive: '', status: 'invited' },
-];
 
 const INTEGRATIONS = [
   { id: 'hudl', name: 'Hudl', description: 'Import game film and highlights automatically', icon: 'H', connected: true, category: 'Video' },
@@ -42,6 +25,7 @@ export default function SettingsPage() {
   const [conference, setConference] = useState('Big 12');
   const [timezone, setTimezone] = useState('America/Chicago');
   const [saved, setSaved] = useState(false);
+  const { team, openCreateModal } = useTeam();
 
   const tabs: { key: SettingsTab; label: string; icon: string }[] = [
     { key: 'general', label: 'General', icon: 'M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75' },
@@ -144,9 +128,9 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-lg font-semibold text-white">Team Members</h2>
-                    <p className="text-sm text-gray-400 mt-1">{MOCK_TEAM.length} members</p>
+                    <p className="text-sm text-gray-400 mt-1">{team.length} members</p>
                   </div>
-                  <button className="btn-primary text-sm">Invite Member</button>
+                  <button onClick={openCreateModal} className="btn-primary text-sm">Invite Member</button>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -161,7 +145,7 @@ export default function SettingsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                      {MOCK_TEAM.map((member) => (
+                      {team.map((member) => (
                         <tr key={member.id} className="hover:bg-white/[0.02]">
                           <td className="py-3">
                             <div className="flex items-center gap-3">

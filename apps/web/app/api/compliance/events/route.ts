@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { COMPLIANCE_EVENTS } from '../../../lib/mock-data';
 
-export const dynamic = 'force-dynamic';
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export async function GET() {

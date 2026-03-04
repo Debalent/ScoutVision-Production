@@ -6,8 +6,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PROSPECTS } from '../../lib/mock-data';
 
-export const dynamic = 'force-dynamic';
-
 interface SearchQuery {
   query: string;
 }

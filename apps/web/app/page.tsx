@@ -4,14 +4,16 @@ import StatCard from './components/StatCard';
 import ActivityFeed from './components/ActivityFeed';
 import ComplianceAlert from './components/ComplianceAlert';
 import ProspectCard from './components/ProspectCard';
-import { DASHBOARD_STATS, RECENT_ACTIVITY, COMPLIANCE_EVENTS, PROSPECTS, VISITS, STAGES } from './lib/mock-data';
+import { useProspects } from './components/ProspectContext';
+import { DASHBOARD_STATS, RECENT_ACTIVITY, COMPLIANCE_EVENTS, VISITS, STAGES } from './lib/mock-data';
 import { formatDate, pct } from './lib/utils';
 
 export default function DashboardPage() {
+  const { prospects, openAddModal } = useProspects();
   const upcomingVisits = VISITS.filter((v) => v.status === 'scheduled').sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-  const topProspects = PROSPECTS.filter((p) => p.commitmentScore !== null)
+  const topProspects = prospects.filter((p) => p.commitmentScore !== null)
     .sort((a, b) => (b.commitmentScore ?? 0) - (a.commitmentScore ?? 0))
     .slice(0, 5);
   const alerts = COMPLIANCE_EVENTS.filter((e) => !e.resolved).slice(0, 4);
@@ -33,7 +35,7 @@ export default function DashboardPage() {
               Export
             </span>
           </button>
-          <button className="btn-primary text-sm">
+          <button className="btn-primary text-sm" onClick={openAddModal}>
             <span className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
               Add Prospect
@@ -136,7 +138,7 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-3">
               {upcomingVisits.slice(0, 4).map((v) => {
-                const prospect = PROSPECTS.find((p) => p.id === v.prospectId);
+                const prospect = prospects.find((p) => p.id === v.prospectId);
                 return (
                   <div key={v.id} className="flex items-center gap-3 text-sm p-2.5 rounded-xl hover:bg-white/[0.02] transition-colors">
                     <div className="w-2 h-2 rounded-full bg-electric shrink-0 animate-pulse-glow" />
@@ -171,8 +173,8 @@ export default function DashboardPage() {
           </div>
           <div className="space-y-4">
             {STAGES.map((stage) => {
-              const count = PROSPECTS.filter((p) => p.stageId === stage.id).length;
-              const total = PROSPECTS.length;
+              const count = prospects.filter((p) => p.stageId === stage.id).length;
+              const total = prospects.length;
               const pctVal = total > 0 ? (count / total) * 100 : 0;
               return (
                 <div key={stage.id} className="space-y-2 group">

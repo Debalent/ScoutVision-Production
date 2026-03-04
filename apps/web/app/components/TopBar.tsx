@@ -4,8 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import NotificationCenter from './NotificationCenter';
 import { useSidebar } from './SidebarContext';
+import { useProspects } from './ProspectContext';
+import { useTeam } from './TeamContext';
 
 export default function TopBar() {
+  const { openAddModal } = useProspects();
+  const { openCreateModal } = useTeam();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -168,8 +172,31 @@ export default function TopBar() {
               <div className="p-3">
                 <p className="text-[10px] font-medium text-gray-600 uppercase tracking-wider px-2 mb-2">Quick Actions</p>
                 <div className="space-y-0.5">
+                  {/* Add New Prospect — opens modal */}
+                  <button
+                    onClick={() => { setSearchOpen(false); openAddModal(); }}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors group w-full text-left"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 group-hover:text-electric transition-colors">
+                      <path d="M8 12h8 M12 8v8" />
+                    </svg>
+                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Add New Prospect</span>
+                  </button>
+                  {/* Create Profile — opens modal */}
+                  <button
+                    onClick={() => { setSearchOpen(false); openCreateModal(); }}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors group w-full text-left"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 group-hover:text-electric transition-colors">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <line x1="19" y1="8" x2="19" y2="14" />
+                      <line x1="22" y1="11" x2="16" y2="11" />
+                    </svg>
+                    <span className="text-sm text-gray-300 group-hover:text-white transition-colors">Create Profile</span>
+                  </button>
+                  {/* Other quick actions */}
                   {[
-                    { label: 'Add New Prospect', icon: 'M8 12h8 M12 8v8', href: '/crm' },
                     { label: 'Upload Video', icon: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12', href: '/video' },
                     { label: 'Generate Report', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8', href: '/analytics' },
                     { label: 'View Compliance Calendar', icon: 'M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', href: '/compliance' },

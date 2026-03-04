@@ -4,6 +4,10 @@ import { Inter } from 'next/font/google';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import { SidebarProvider } from './components/SidebarContext';
+import { ProspectProvider } from './components/ProspectContext';
+import AddProspectModal from './components/AddProspectModal';
+import { TeamProvider } from './components/TeamContext';
+import CreateProfileModal from './components/CreateProfileModal';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -79,6 +83,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark">
       <body className={inter.className + ' bg-navy text-white min-h-screen antialiased'}>
         <SidebarProvider>
+          <ProspectProvider>
+          <TeamProvider>
           <Sidebar />
           <main className="lg:ml-[260px] min-h-screen transition-[margin] duration-200 relative z-10">
             <TopBar />
@@ -86,6 +92,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </div>
           </main>
+          <AddProspectModal />
+          <CreateProfileModal />
+          </TeamProvider>
+          </ProspectProvider>
         </SidebarProvider>
       </body>
     </html>
