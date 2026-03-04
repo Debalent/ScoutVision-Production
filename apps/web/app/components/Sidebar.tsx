@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { useSidebar } from './SidebarContext';
+import logoImg from '../../public/logo.png';
 
 const NAV_ITEMS = [
   { href: '/',           label: 'Dashboard',   icon: DashboardIcon },
@@ -39,7 +40,7 @@ export default function Sidebar() {
       <div className="px-5 py-5 border-b border-white/[0.06]">
         <div className="bg-white/[0.04] rounded-xl p-3 border border-white/[0.04]">
           <Image
-            src="/logo.png"
+            src={logoImg}
             alt="Scout Vision"
             width={200}
             height={50}
