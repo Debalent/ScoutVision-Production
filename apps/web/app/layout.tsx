@@ -3,8 +3,10 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
+import MobileSportBar from './components/MobileSportBar';
 import { SidebarProvider } from './components/SidebarContext';
 import { ProspectProvider } from './components/ProspectContext';
+import { SportProvider } from './components/SportContext';
 import AddProspectModal from './components/AddProspectModal';
 import { TeamProvider } from './components/TeamContext';
 import CreateProfileModal from './components/CreateProfileModal';
@@ -83,11 +85,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="dark">
       <body className={inter.className + ' bg-navy text-white min-h-screen antialiased'}>
         <SidebarProvider>
+          <SportProvider>
           <ProspectProvider>
           <TeamProvider>
           <Sidebar />
           <main className="lg:ml-[260px] min-h-screen transition-[margin] duration-200 relative z-10">
             <TopBar />
+            <MobileSportBar />
             <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
               {children}
             </div>
@@ -96,6 +100,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CreateProfileModal />
           </TeamProvider>
           </ProspectProvider>
+          </SportProvider>
         </SidebarProvider>
       </body>
     </html>

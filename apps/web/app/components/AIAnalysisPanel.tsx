@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '../lib/utils';
+import { useSport } from './SportContext';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -70,6 +71,7 @@ export default function AIAnalysisPanel({ videoId }: { videoId: string }) {
   const [job, setJob] = useState<AnalysisJob | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'highlights' | 'plays'>('overview');
+  const { sport } = useSport();
 
   const startAnalysis = useCallback(async () => {
     setIsAnalyzing(true);
@@ -77,14 +79,14 @@ export default function AIAnalysisPanel({ videoId }: { videoId: string }) {
       const res = await fetch('/api/analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId, sport: 'football' }),
+        body: JSON.stringify({ videoId, sport }),
       });
       const data = await res.json();
-      setJob({ jobId: data.jobId, videoId, sport: 'football', status: 'queued', progress: 0, stage: 'queued', createdAt: new Date().toISOString() });
+      setJob({ jobId: data.jobId, videoId, sport, status: 'queued', progress: 0, stage: 'queued', createdAt: new Date().toISOString() });
     } catch {
       setIsAnalyzing(false);
     }
-  }, [videoId]);
+  }, [videoId, sport]);
 
   // Poll for status
   useEffect(() => {

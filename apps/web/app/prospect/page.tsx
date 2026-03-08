@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useSport } from '../components/SportContext';
+import DemoEvaluationPanel from '../components/DemoEvaluationPanel';
+import type { DemoProspect } from '../lib/demo-data';
 
 type ProfileTab = 'overview' | 'stats' | 'evaluations' | 'film' | 'ai' | 'communication' | 'timeline';
 
@@ -80,6 +83,9 @@ const PROSPECT = {
 
 export default function ProspectProfilePage() {
   const [activeTab, setActiveTab] = useState<ProfileTab>('overview');
+  const { sport, sportPack, levelPack, demoMode, demoProspects } = useSport();
+  const [selectedDemoIdx, setSelectedDemoIdx] = useState(0);
+  const demoProspect: DemoProspect | undefined = demoProspects[selectedDemoIdx];
   const p = PROSPECT;
 
   const tabs: { key: ProfileTab; label: string }[] = [
@@ -103,17 +109,17 @@ export default function ProspectProfilePage() {
           Back to CRM
         </Link>
 
-        <div className="card p-6">
-          <div className="flex items-start gap-6">
+        <div className="card p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-electric-500 to-electric-700 flex items-center justify-center text-2xl font-bold text-white shrink-0">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br from-electric-500 to-electric-700 flex items-center justify-center text-xl sm:text-2xl font-bold text-white shrink-0">
               {p.firstName[0]}{p.lastName[0]}
             </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-white">{p.firstName} {p.lastName}</h1>
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold text-white">{p.firstName} {p.lastName}</h1>
                 <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-300">{p.position}</span>
                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                   p.tier === 'A' ? 'bg-green-500/20 text-green-300' :
@@ -121,16 +127,16 @@ export default function ProspectProfilePage() {
                   'bg-gray-500/20 text-gray-300'
                 }`}>Tier {p.tier}</span>
               </div>
-              <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-gray-400 flex-wrap">
                 <span>{p.highSchool}</span>
-                <span className="w-1 h-1 rounded-full bg-gray-600" />
+                <span className="w-1 h-1 rounded-full bg-gray-600 hidden sm:block" />
                 <span>{p.city}, {p.state}</span>
-                <span className="w-1 h-1 rounded-full bg-gray-600" />
+                <span className="w-1 h-1 rounded-full bg-gray-600 hidden sm:block" />
                 <span>Class of {p.classYear}</span>
-                <span className="w-1 h-1 rounded-full bg-gray-600" />
+                <span className="w-1 h-1 rounded-full bg-gray-600 hidden sm:block" />
                 <span>{p.height} / {p.weight} lbs</span>
               </div>
-              <div className="flex items-center gap-2 mt-3">
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
                 {p.tags.map((tag) => (
                   <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/5 text-gray-300 border border-white/5">{tag}</span>
                 ))}
@@ -138,7 +144,7 @@ export default function ProspectProfilePage() {
             </div>
 
             {/* Right side metrics */}
-            <div className="flex items-center gap-4 shrink-0">
+            <div className="flex items-center gap-3 sm:gap-4 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
               <div className="text-center">
                 <div className="text-2xl font-bold text-electric-400">{p.commitmentScore}%</div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-wider">Commit Score</div>
@@ -157,12 +163,42 @@ export default function ProspectProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-white/5 pb-px">
+      {/* Demo Mode Banner */}
+      {demoMode && demoProspect && (
+        <div className="card p-4 border border-amber-500/20 bg-amber-500/5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2.5">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 uppercase tracking-wider">Demo Mode</span>
+              <span className="text-sm text-gray-300">
+                Viewing <strong className="text-white">{demoProspect.firstName} {demoProspect.lastName}</strong> — {demoProspect.position} — {sportPack.icon} {sportPack.label} / {levelPack.label}
+              </span>
+            </div>
+            {demoProspects.length > 1 && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Prospect:</span>
+                {demoProspects.map((dp, i) => (
+                  <button
+                    key={dp.id}
+                    onClick={() => setSelectedDemoIdx(i)}
+                    className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
+                      i === selectedDemoIdx ? 'bg-electric/20 text-electric border border-electric/30' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white border border-white/5'
+                    }`}
+                  >
+                    {dp.firstName} {dp.lastName[0]}.
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center gap-1 border-b border-white/5 pb-px overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
+            className={`px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap ${
               activeTab === tab.key
                 ? 'text-electric-400 border-electric-400'
                 : 'text-gray-400 border-transparent hover:text-white hover:border-white/20'
@@ -175,27 +211,41 @@ export default function ProspectProfilePage() {
 
       {/* Tab Content */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Quick Stats */}
-          <div className="card p-5 col-span-2">
-            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Athletics</h3>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: '40-Yard Dash', value: `${p.fortyYard}s`, grade: 'B+' },
-                { label: 'Shuttle', value: `${p.shuttle}s`, grade: 'B' },
-                { label: 'Vertical', value: `${p.vertical}"`, grade: 'A-' },
-                { label: 'Broad Jump', value: `${p.broad}"`, grade: 'B+' },
-                { label: 'Bench', value: `${p.bench} lbs`, grade: 'C+' },
-                { label: 'Squat', value: `${p.squat} lbs`, grade: 'B+' },
-              ].map((stat) => (
-                <div key={stat.label} className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-                  <div className="text-xs text-gray-500">{stat.label}</div>
-                  <div className="flex items-end justify-between mt-1">
-                    <span className="text-lg font-semibold text-white">{stat.value}</span>
-                    <span className="text-xs font-medium text-electric-400">{stat.grade}</span>
+          <div className="card p-5 lg:col-span-2">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Athletics {demoMode && <span className="text-electric-400 normal-case ml-1">({sportPack.label})</span>}</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              {demoMode && demoProspect ? (
+                sportPack.measurables.map((m) => {
+                  const val = demoProspect.evaluation.measurables[m.key];
+                  return (
+                    <div key={m.key} className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                      <div className="text-xs text-gray-500">{m.label}</div>
+                      <div className="flex items-end justify-between mt-1">
+                        <span className="text-lg font-semibold text-white">{val ?? '—'}{val != null && m.unit ? <span className="text-xs text-gray-500 ml-0.5">{m.unit}</span> : ''}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                [
+                  { label: '40-Yard Dash', value: `${p.fortyYard}s`, grade: 'B+' },
+                  { label: 'Shuttle', value: `${p.shuttle}s`, grade: 'B' },
+                  { label: 'Vertical', value: `${p.vertical}"`, grade: 'A-' },
+                  { label: 'Broad Jump', value: `${p.broad}"`, grade: 'B+' },
+                  { label: 'Bench', value: `${p.bench} lbs`, grade: 'C+' },
+                  { label: 'Squat', value: `${p.squat} lbs`, grade: 'B+' },
+                ].map((stat) => (
+                  <div key={stat.label} className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
+                    <div className="text-xs text-gray-500">{stat.label}</div>
+                    <div className="flex items-end justify-between mt-1">
+                      <span className="text-lg font-semibold text-white">{stat.value}</span>
+                      <span className="text-xs font-medium text-electric-400">{stat.grade}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -212,7 +262,7 @@ export default function ProspectProfilePage() {
           </div>
 
           {/* Recent Notes */}
-          <div className="card p-5 col-span-2">
+          <div className="card p-5 lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Recent Notes</h3>
               <button className="text-xs text-electric-400 hover:text-electric-300">+ Add Note</button>
@@ -252,7 +302,7 @@ export default function ProspectProfilePage() {
         <div className="space-y-4">
           <div className="card p-6">
             <h3 className="text-base font-semibold text-white mb-4">Athletic Testing</h3>
-            <div className="grid grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               {[
                 { label: '40-Yard', value: p.fortyYard, unit: 's', percentile: 78, avg: 4.75 },
                 { label: 'Shuttle', value: p.shuttle, unit: 's', percentile: 72, avg: 4.30 },
@@ -278,7 +328,7 @@ export default function ProspectProfilePage() {
 
           <div className="card p-6">
             <h3 className="text-base font-semibold text-white mb-4">Sport-Specific Metrics</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.entries(p.sportMetrics).map(([key, value]) => {
                 const pct = key === 'completionPct' ? (value as number) : key === 'qbRating' ? ((value as number) / 158.3 * 100) : Math.min(100, ((value as number) / 40) * 100);
                 return (
@@ -349,7 +399,7 @@ export default function ProspectProfilePage() {
             <h3 className="text-base font-semibold text-white">Film Library ({p.film.length})</h3>
             <button className="btn-primary text-sm">Upload Film</button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {p.film.map((video) => (
               <div key={video.id} className="card p-4 hover:border-white/10 transition-colors cursor-pointer">
                 <div className="aspect-video rounded-lg bg-black/40 border border-white/5 flex items-center justify-center mb-3 relative">
@@ -373,27 +423,30 @@ export default function ProspectProfilePage() {
       )}
 
       {activeTab === 'ai' && (
+        demoMode && demoProspect ? (
+          <DemoEvaluationPanel prospect={demoProspect} />
+        ) : (
         <div className="space-y-4">
-          <div className="grid grid-cols-4 gap-4">
-            <div className="card card-hover p-5 text-center">
-              <div className="text-3xl font-bold text-electric-400">{p.aiReport.overallGrade}</div>
-              <div className="text-xs text-gray-500 mt-1">AI Overall Grade</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="card card-hover p-4 sm:p-5 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-electric-400">{p.aiReport.overallGrade}</div>
+              <div className="text-[10px] text-gray-500 mt-1">AI Overall Grade</div>
             </div>
-            <div className="card card-hover p-5 text-center">
-              <div className="text-3xl font-bold text-green-400">{p.aiReport.fitScore}</div>
-              <div className="text-xs text-gray-500 mt-1">Program Fit</div>
+            <div className="card card-hover p-4 sm:p-5 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-green-400">{p.aiReport.fitScore}</div>
+              <div className="text-[10px] text-gray-500 mt-1">Program Fit</div>
             </div>
-            <div className="card card-hover p-5 text-center">
-              <div className="text-3xl font-bold text-yellow-400">{p.aiReport.projections.ceiling}</div>
+            <div className="card card-hover p-4 sm:p-5 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-yellow-400">{p.aiReport.projections.ceiling}</div>
               <div className="text-xs text-gray-500 mt-1">Ceiling Projection</div>
             </div>
-            <div className="card card-hover p-5 text-center">
-              <div className="text-3xl font-bold text-white">${(p.aiReport.nilEstimate.value / 1000).toFixed(0)}K</div>
+            <div className="card card-hover p-4 sm:p-5 text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white">${(p.aiReport.nilEstimate.value / 1000).toFixed(0)}K</div>
               <div className="text-xs text-gray-500 mt-1">NIL Estimate</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="card p-5">
               <h3 className="text-sm font-semibold text-green-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
@@ -464,6 +517,7 @@ export default function ProspectProfilePage() {
             </div>
           </div>
         </div>
+        )
       )}
 
       {activeTab === 'communication' && (

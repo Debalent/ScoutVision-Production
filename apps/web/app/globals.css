@@ -445,3 +445,7 @@ button:active:not(:disabled) {
 .text-h6 { font-size: 0.875rem; line-height: 1.45; font-weight: 600; }
 .text-body { font-size: 0.875rem; line-height: 1.6; }
 .text-caption { font-size: 0.75rem; line-height: 1.5; color: var(--text-muted); }
+
+/* ─── Scrollbar Hide ─────────────────────────────────────────────── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

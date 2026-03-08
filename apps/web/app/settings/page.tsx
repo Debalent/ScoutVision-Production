@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import { useTeam } from '../components/TeamContext';
+import { useSport } from '../components/SportContext';
 
 type SettingsTab = 'general' | 'team' | 'integrations' | 'notifications' | 'billing' | 'security';
 
@@ -19,8 +20,9 @@ const INTEGRATIONS = [
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+  const { sportPack, sport: ctxSport, setSport: setCtxSport, sportList, levelPack, level: ctxLevel, setLevel: setCtxLevel, levelList, demoMode, toggleDemoMode } = useSport();
   const [programName, setProgramName] = useState('University Football');
-  const [sport, setSport] = useState('Football');
+  const [sport, setSport] = useState(sportPack.label);
   const [division, setDivision] = useState('Division I');
   const [conference, setConference] = useState('Big 12');
   const [timezone, setTimezone] = useState('America/Chicago');
@@ -88,8 +90,8 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Sport</label>
-                  <select value={sport} onChange={(e) => setSport(e.target.value)} className="input-field w-full">
-                    <option>Football</option><option>Basketball</option><option>Baseball</option><option>Soccer</option><option>Track & Field</option>
+                  <select value={sport} onChange={(e) => { setSport(e.target.value); const found = sportList.find((s) => s.label === e.target.value); if (found) setCtxSport(found.key); }} className="input-field w-full">
+                    <option>Football</option><option>Basketball</option><option>Baseball</option><option>Soccer</option><option>Hockey</option>
                   </select>
                 </div>
                 <div>

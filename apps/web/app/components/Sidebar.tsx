@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '../lib/utils';
 import { useSidebar } from './SidebarContext';
+import { useSport } from './SportContext';
 import logoImg from '../../public/logo.png';
 
 const NAV_ITEMS = [
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { open, close } = useSidebar();
+  const { sport, setSport, sportList, level, setLevel, levelList, demoMode, toggleDemoMode } = useSport();
 
   return (
     <>
@@ -51,7 +53,72 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-0.5">
+      <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
+        {/* Sport & Level Selectors */}
+        <div className="px-1 pb-4 space-y-2 border-b border-white/[0.06] mb-3">
+          {/* Sport Selector */}
+          <div>
+            <label className="block text-[10px] text-gray-500 uppercase tracking-wider font-medium px-2 mb-1">Sport</label>
+            <div className="grid grid-cols-5 gap-1">
+              {sportList.map((s) => (
+                <button
+                  key={s.key}
+                  onClick={() => setSport(s.key)}
+                  title={s.label}
+                  className={cn(
+                    'flex items-center justify-center py-1.5 rounded-lg text-base transition-all duration-150',
+                    sport === s.key
+                      ? 'bg-electric/[0.12] ring-1 ring-electric/30 scale-105'
+                      : 'bg-white/[0.02] hover:bg-white/[0.06] opacity-60 hover:opacity-100'
+                  )}
+                >
+                  {s.icon}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Level Selector */}
+          <div>
+            <label className="block text-[10px] text-gray-500 uppercase tracking-wider font-medium px-2 mb-1">Level</label>
+            <select
+              value={level}
+              onChange={(e) => setLevel(e.target.value)}
+              title="Select evaluation level"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg text-xs text-gray-300 px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-electric/30 transition-all"
+            >
+              {levelList.map((l) => (
+                <option key={l.key} value={l.key} className="bg-navy text-gray-300">{l.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Demo Mode Toggle */}
+          <button
+            onClick={toggleDemoMode}
+            className={cn(
+              'w-full flex items-center gap-2.5 px-2 py-2 rounded-lg text-xs font-medium transition-all duration-200',
+              demoMode
+                ? 'bg-electric/[0.12] text-electric border border-electric/20'
+                : 'bg-white/[0.02] text-gray-400 border border-white/[0.06] hover:bg-white/[0.04] hover:text-gray-300'
+            )}
+          >
+            <div className={cn(
+              'w-8 h-4 rounded-full relative transition-colors duration-200',
+              demoMode ? 'bg-electric/30' : 'bg-white/10'
+            )}>
+              <div className={cn(
+                'absolute top-0.5 w-3 h-3 rounded-full transition-all duration-200',
+                demoMode ? 'left-4 bg-electric' : 'left-0.5 bg-gray-500'
+              )} />
+            </div>
+            <span>Demo Mode</span>
+            {demoMode && (
+              <span className="ml-auto text-[10px] bg-electric/20 text-electric px-1.5 py-0.5 rounded-full">ON</span>
+            )}
+          </button>
+        </div>
+
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
           return (

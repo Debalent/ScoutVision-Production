@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { PROSPECTS } from '../lib/mock-data';
 import { cn, getInitials } from '../lib/utils';
 import type { Prospect } from '../lib/types';
+import { useSport } from '../components/SportContext';
 
 type CompareMetric = {
   label: string;
@@ -41,6 +42,7 @@ export default function ComparePage() {
   const [showSelector, setShowSelector] = useState(false);
   const [selectorSlot, setSelectorSlot] = useState<number>(0);
   const [activeSection, setActiveSection] = useState<'athletic' | 'academic' | 'recruiting'>('athletic');
+  const { sportPack } = useSport();
 
   const selectedProspects = selectedIds
     .map((id) => PROSPECTS.find((p) => p.id === id))
@@ -145,7 +147,7 @@ export default function ComparePage() {
                 activeSection === section ? 'bg-electric/10 text-electric' : 'text-gray-400 hover:text-white'
               )}
             >
-              {section}
+              {section === 'athletic' ? `${sportPack.icon} Athletic` : section}
             </button>
           ))}
         </div>
