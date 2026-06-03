@@ -261,8 +261,8 @@ export const SOCCER_PACK: SportPack = {
   ],
   skills: [
     { key: 'firstTouch', label: 'First Touch', description: 'Ball control, receiving quality, body positioning' },
-    { key: 'vision', label: 'Vision', description: 'Awareness, passing lanes, spatial intelligence' },
-    { key: 'passingRange', label: 'Passing Range', description: 'Short, medium, long-range distribution' },
+    { key: 'vision', label: 'Vision', description: 'Awareness, distribution lanes, spatial intelligence' },
+    { key: 'passingRange', label: 'Distribution Range', description: 'Short, medium, long-range ball distribution' },
     { key: 'defensiveWorkRate', label: 'Defensive Work Rate', description: 'Pressing, tracking back, off-ball effort' },
     { key: 'dribbling', label: 'Dribbling', description: '1v1 ability, ball carrying, close control' },
     { key: 'positioning', label: 'Positioning', description: 'Off-ball movement, finding space, timing runs' },
@@ -274,7 +274,7 @@ export const SOCCER_PACK: SportPack = {
     { key: 'targetStriker', label: 'Target Striker', description: 'Focal point of attack who holds up play', keyTraits: ['Hold-up play', 'Aerial ability', 'Finishing'] },
     { key: 'deepPlaymaker', label: 'Deep Playmaker', description: 'Dictates tempo from a deep midfield position', keyTraits: ['Passing range', 'Vision', 'Composure'] },
     { key: 'modernFullback', label: 'Modern Fullback', description: 'Overlapping wing-back with offensive contribution', keyTraits: ['Crossing', 'Speed', 'Defensive recovery'] },
-    { key: 'ballPlayingCB', label: 'Ball-Playing CB', description: 'Center-back who builds from the back', keyTraits: ['Passing under pressure', 'Reading play', 'Aerial dominance'] },
+    { key: 'ballPlayingCB', label: 'Ball-Playing CB', description: 'Center-back who builds from the back', keyTraits: ['Distribution under pressure', 'Reading play', 'Aerial dominance'] },
   ],
   positions: [
     { key: 'gk', label: 'Goalkeeper', positions: ['GK'], specificSkills: ['Shot stopping', 'Distribution', 'Commanding area', 'Sweeping'] },
@@ -314,7 +314,7 @@ export const HOCKEY_PACK: SportPack = {
   skills: [
     { key: 'skating', label: 'Skating', description: 'Speed, edges, crossovers, transitions, stride' },
     { key: 'puckHandling', label: 'Puck Handling', description: 'Stickhandling, dekes, puck protection' },
-    { key: 'hockeyVision', label: 'Vision', description: 'Playmaking, passing, ice awareness' },
+    { key: 'hockeyVision', label: 'Vision', description: 'Playmaking, puck distribution, ice awareness' },
     { key: 'physicality', label: 'Physicality', description: 'Board play, body checking, net-front presence' },
     { key: 'shooting', label: 'Shooting', description: 'Wrist shot, slap shot, accuracy, release' },
     { key: 'defensivePlay', label: 'Defensive Play', description: 'Gap control, stick positioning, back-checking' },
@@ -326,7 +326,7 @@ export const HOCKEY_PACK: SportPack = {
     { key: 'powerForward', label: 'Power Forward', description: 'Physical forward who drives to the net', keyTraits: ['Net-front presence', 'Board play', 'Shooting'] },
     { key: 'sniper', label: 'Sniper', description: 'Pure goal scorer with elite shot', keyTraits: ['Shot accuracy', 'Release speed', 'Scoring instinct'] },
     { key: 'stayAtHomeD', label: 'Stay-at-Home D', description: 'Defensive specialist who shuts down opponents', keyTraits: ['Gap control', 'Shot blocking', 'Physical play'] },
-    { key: 'playmakingWinger', label: 'Playmaking Winger', description: 'Creative winger who sets up teammates', keyTraits: ['Vision', 'Passing', 'Entry skills'] },
+    { key: 'playmakingWinger', label: 'Playmaking Winger', description: 'Creative winger who sets up teammates', keyTraits: ['Vision', 'Distribution', 'Entry skills'] },
   ],
   positions: [
     { key: 'c', label: 'Center', positions: ['C'], specificSkills: ['Faceoffs', 'Two-way play', 'Playmaking', 'Defensive responsibility'] },
