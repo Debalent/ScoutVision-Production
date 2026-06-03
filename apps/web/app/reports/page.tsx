@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { PROSPECTS } from '../lib/mock-data';
-import { cn, getInitials, formatDate } from '../lib/utils';
+import { useState, useEffect } from 'react';
+import { cn, formatDate } from '../lib/utils';
 
 type ReportType = 'scouting' | 'comparison' | 'pipeline' | 'compliance';
 
@@ -18,7 +17,8 @@ interface Report {
   summary: string;
 }
 
-const MOCK_REPORTS: Report[] = [
+// Static fallback — shown instantly before API responds
+const FALLBACK_REPORTS: Report[] = [
   {
     id: 'r1',
     title: 'Class of 2027 QB Evaluation Report',
@@ -86,10 +86,38 @@ const REPORT_TYPE_CONFIG: Record<ReportType, { label: string; color: string; bg:
 export default function ReportsPage() {
   const [activeFilter, setActiveFilter] = useState<ReportType | 'all'>('all');
   const [showGenerator, setShowGenerator] = useState(false);
+  const [reports, setReports]             = useState<Report[]>(FALLBACK_REPORTS);
+
+  useEffect(() => {
+    fetch('/api/reports')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        const arr: Report[] = data?.reports ?? data;
+        if (Array.isArray(arr) && arr.length > 0) {
+          // Map ScoutingReport shape from API to local Report shape
+          const mapped: Report[] = (arr as unknown[]).map((item) => {
+            const r = item as Record<string, unknown>;
+            return {
+              id:         String(r.id ?? ''),
+              title:      String(r.title ?? `${String(r.prospectName ?? 'Unknown')} Scouting Report`),
+              type:       (r.type as ReportType) ?? 'scouting',
+              status:     'completed' as const,
+              createdAt:  String(r.generatedAt ?? r.createdAt ?? new Date().toISOString()),
+              author:     'AI',
+              prospects:  r.prospectName ? [String(r.prospectName)] : [],
+              pages:      10,
+              summary:    String(r.summary ?? ''),
+            };
+          });
+          setReports(mapped);
+        }
+      })
+      .catch(() => { /* keep fallback */ });
+  }, []);
 
   const filtered = activeFilter === 'all'
-    ? MOCK_REPORTS
-    : MOCK_REPORTS.filter((r) => r.type === activeFilter);
+    ? reports
+    : reports.filter((r) => r.type === activeFilter);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -97,7 +125,7 @@ export default function ReportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="page-title">Reports & Intelligence</h1>
-          <p className="text-sm text-gray-500 mt-1">{MOCK_REPORTS.length} reports generated this cycle</p>
+          <p className="text-sm text-gray-500 mt-1">{reports.length} reports generated this cycle</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="btn-secondary text-sm">Schedule Report</button>
@@ -109,19 +137,19 @@ export default function ReportsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card card-hover px-5 py-4">
           <p className="stat-label">Total Reports</p>
-          <p className="stat-value">{MOCK_REPORTS.length}</p>
+          <p className="stat-value">{reports.length}</p>
         </div>
         <div className="card card-hover px-5 py-4">
           <p className="stat-label">AI Generated</p>
-          <p className="stat-value text-electric">3</p>
+          <p className="stat-value text-electric">{reports.filter((r) => r.author === 'AI').length}</p>
         </div>
         <div className="card card-hover px-5 py-4">
-          <p className="stat-label">Scheduled</p>
-          <p className="stat-value text-amber-400">2</p>
+          <p className="stat-label">Scouting Reports</p>
+          <p className="stat-value text-amber-400">{reports.filter((r) => r.type === 'scouting').length}</p>
         </div>
         <div className="card card-hover px-5 py-4">
           <p className="stat-label">Total Pages</p>
-          <p className="stat-value">44</p>
+          <p className="stat-value">{reports.reduce((s, r) => s + r.pages, 0)}</p>
         </div>
       </div>
 
@@ -251,6 +279,21 @@ function ReportGenerator({ onClose }: { onClose: () => void }) {
   const [reportType, setReportType] = useState<ReportType>('scouting');
   const [selectedProspects, setSelectedProspects] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
+  const [prospects, setProspects] = useState<{ id: string; firstName: string; lastName: string; position?: string; highSchool?: string }[]>([]);
+
+  useEffect(() => {
+    fetch('/api/prospects')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data?.prospects;
+        if (Array.isArray(arr)) setProspects(arr);
+      })
+      .catch(() => {});
+  }, []);
+
+  function getInitials(name: string) {
+    return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  }
 
   function toggleProspect(id: string) {
     setSelectedProspects((prev) =>
@@ -332,7 +375,7 @@ function ReportGenerator({ onClose }: { onClose: () => void }) {
             <div className="space-y-3">
               <p className="text-sm font-medium mb-4">Select prospects to include</p>
               <div className="max-h-60 overflow-y-auto space-y-1">
-                {PROSPECTS.map((prospect) => {
+                {prospects.map((prospect) => {
                   const isSelected = selectedProspects.includes(prospect.id);
                   return (
                     <button
