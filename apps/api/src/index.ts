@@ -14,10 +14,10 @@ const app = express();
 // ─── CORS — only allow trusted origins ──────────────────────────────
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
   .split(',')
-  .map((o) => o.trim());
+  .map((originValue: string) => originValue.trim());
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: (origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => {
     // Allow same-origin / server-to-server (no origin header)
     if (!origin || ALLOWED_ORIGINS.includes(origin)) {
       callback(null, true);
@@ -34,8 +34,11 @@ app.use(cors({
 app.use((req: Request, res: Response, next: NextFunction) => {
   const mutating = ['POST', 'PATCH', 'PUT', 'DELETE'];
   if (mutating.includes(req.method)) {
-    const ct = req.headers['content-type'] ?? '';
-    if (!ct.includes('application/json')) {
+    const contentTypeHeader = req.headers['content-type'];
+    const contentType = Array.isArray(contentTypeHeader)
+      ? contentTypeHeader.join(',')
+      : contentTypeHeader ?? '';
+    if (!contentType.includes('application/json')) {
       return res.status(415).json({ error: 'Content-Type must be application/json' });
     }
   }
@@ -46,6 +49,11 @@ app.use(express.json({ limit: '1mb' }));
 
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'Scout Vision API' });
+});
+
+// Keep-alive ping — prevents Render free tier cold starts during demos
+app.get('/ping', (_req: Request, res: Response) => {
+  res.json({ pong: true, ts: Date.now() });
 });
 
 app.use('/auth', authRoutes);

@@ -8,16 +8,7 @@
   "regions": ["iad1"],
   "functions": {
     "apps/web/app/api/**/*.ts": {
-      "maxDuration": 30,
-      "memory": 1024
-    },
-    "apps/web/app/api/analysis/route.ts": {
-      "maxDuration": 60,
-      "memory": 3008
-    },
-    "apps/web/app/api/reports/route.ts": {
-      "maxDuration": 45,
-      "memory": 1024
+      "maxDuration": 10
     }
   },
   "headers": [
@@ -43,16 +34,6 @@
     {
       "source": "/api/v1/:path*",
       "destination": "/api/:path*"
-    }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron/compliance-check",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/data-sync",
-      "schedule": "0 */4 * * *"
     }
   ]
 }
