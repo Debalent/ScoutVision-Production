@@ -84,7 +84,22 @@ export default function CRMPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="btn-secondary text-sm">
+          <button
+            className="btn-secondary text-sm"
+            onClick={() => {
+              const csv = [
+                'Name,Position,School,City,State,Class,GPA,40-Yd,Stage,Score',
+                ...filtered.map((p) => [
+                  `"${p.firstName} ${p.lastName}"`, p.position, `"${p.highSchool ?? ''}"`,
+                  p.city, p.state, p.classYear, p.academics?.gpa ?? '',
+                  p.stats?.fortyYard ?? '', `"${p.stage?.name ?? ''}"`, p.commitmentScore ?? '',
+                ].join(',')),
+              ].join('\n');
+              const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+              const a = document.createElement('a'); a.href = url; a.download = 'prospects.csv'; a.click();
+              URL.revokeObjectURL(url);
+            }}
+          >
             <span className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export CSV
@@ -295,68 +310,161 @@ function KanbanCard({ prospect, stageColor }: { prospect: Prospect; stageColor: 
 
 // ─── Prospect Table ─────────────────────────────────────────────────
 
-function ProspectTable({ prospects }: { prospects: Prospect[] }) {
+type SortField = 'name' | 'position' | 'school' | 'class' | 'gpa' | 'forty' | 'stage' | 'score';
+type SortDir = 'asc' | 'desc';
+
+function SortIcon({ field, active, dir }: { field: string; active: boolean; dir: SortDir }) {
   return (
-    <div className="card overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/5">
-              <th className="table-header">Name</th>
-              <th className="table-header">Position</th>
-              <th className="table-header">School</th>
-              <th className="table-header">Location</th>
-              <th className="table-header">Class</th>
-              <th className="table-header">GPA</th>
-              <th className="table-header">40-Yd</th>
-              <th className="table-header">Stage</th>
-              <th className="table-header text-right">Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {prospects.map((p) => {
-              const scoreColor = (p.commitmentScore ?? 0) >= 75
-                ? 'text-emerald-400' : (p.commitmentScore ?? 0) >= 50
-                ? 'text-amber-400' : 'text-gray-400';
-              return (
-                <tr key={p.id} className="table-row">
-                  <td className="table-cell">
-                    <Link href={`/crm/${p.id}`} className="flex items-center gap-3 hover:text-electric transition-colors">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-electric shrink-0">
-                        {getInitials(`${p.firstName} ${p.lastName}`)}
-                      </div>
-                      <span className="font-medium">{p.firstName} {p.lastName}</span>
-                    </Link>
-                  </td>
-                  <td className="table-cell">
-                    <span className="badge-gray text-[10px]">{p.position}</span>
-                  </td>
-                  <td className="table-cell text-gray-400">{p.highSchool || '—'}</td>
-                  <td className="table-cell text-gray-400">{p.city}, {p.state}</td>
-                  <td className="table-cell text-gray-400">{p.classYear}</td>
-                  <td className="table-cell text-gray-400">{p.academics?.gpa?.toFixed(2) || '—'}</td>
-                  <td className="table-cell text-gray-400">{p.stats?.fortyYard || '—'}</td>
-                  <td className="table-cell">
-                    <span
-                      className="badge text-[10px]"
-                      style={{
-                        backgroundColor: `${p.stage?.color}15`,
-                        color: p.stage?.color,
-                      }}
-                    >
-                      {p.stage?.name || '—'}
-                    </span>
-                  </td>
-                  <td className="table-cell text-right">
-                    <span className={cn('font-bold', scoreColor)}>
-                      {p.commitmentScore ?? '—'}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn('inline-block ml-1', active ? 'text-electric' : 'text-gray-600')}>
+      {active && dir === 'asc'
+        ? <path d="M12 5v14M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
+        : active && dir === 'desc'
+        ? <path d="M12 5v14M5 12l7 7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+        : <path d="M8 9l4-4 4 4M16 15l-4 4-4-4" strokeLinecap="round" strokeLinejoin="round"/>}
+    </svg>
+  );
+}
+
+function ProspectTable({ prospects }: { prospects: Prospect[] }) {
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  function toggleSort(field: SortField) {
+    if (sortField === field) setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+    else { setSortField(field); setSortDir('asc'); }
+  }
+
+  const sorted = [...prospects].sort((a, b) => {
+    let av: string | number = '', bv: string | number = '';
+    switch (sortField) {
+      case 'name': av = `${a.firstName} ${a.lastName}`; bv = `${b.firstName} ${b.lastName}`; break;
+      case 'position': av = a.position ?? ''; bv = b.position ?? ''; break;
+      case 'school': av = a.highSchool ?? ''; bv = b.highSchool ?? ''; break;
+      case 'class': av = a.classYear ?? 0; bv = b.classYear ?? 0; break;
+      case 'gpa': av = a.academics?.gpa ?? 0; bv = b.academics?.gpa ?? 0; break;
+      case 'forty': av = a.stats?.fortyYard ?? 99; bv = b.stats?.fortyYard ?? 99; break;
+      case 'stage': av = a.stage?.name ?? ''; bv = b.stage?.name ?? ''; break;
+      case 'score': av = a.commitmentScore ?? 0; bv = b.commitmentScore ?? 0; break;
+    }
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const allSelected = sorted.length > 0 && sorted.every((p) => selected.has(p.id));
+
+  function toggleAll() {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(sorted.map((p) => p.id)));
+  }
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  const headers: { label: string; field: SortField; cls?: string }[] = [
+    { label: 'Name', field: 'name' },
+    { label: 'Position', field: 'position' },
+    { label: 'School', field: 'school' },
+    { label: 'Class', field: 'class' },
+    { label: 'GPA', field: 'gpa' },
+    { label: '40-Yd', field: 'forty' },
+    { label: 'Stage', field: 'stage' },
+    { label: 'Score', field: 'score', cls: 'text-right' },
+  ];
+
+  return (
+    <div className="space-y-2">
+      {/* Bulk action bar */}
+      {selected.size > 0 && (
+        <div className="card px-4 py-2.5 flex items-center gap-4 bg-electric/5 border-electric/20">
+          <span className="text-sm font-medium text-electric">{selected.size} selected</span>
+          <div className="flex items-center gap-2 ml-auto">
+            <button
+              className="btn-secondary text-xs py-1.5"
+              onClick={() => {
+                const rows = sorted.filter((p) => selected.has(p.id));
+                const csv = [
+                  'Name,Position,School,City,State,Class,GPA,40-Yd,Stage,Score',
+                  ...rows.map((p) => [
+                    `"${p.firstName} ${p.lastName}"`, p.position, `"${p.highSchool}"`,
+                    p.city, p.state, p.classYear, p.academics?.gpa ?? '',
+                    p.stats?.fortyYard ?? '', `"${p.stage?.name ?? ''}"`, p.commitmentScore ?? '',
+                  ].join(',')),
+                ].join('\n');
+                const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+                const a = document.createElement('a'); a.href = url; a.download = 'prospects.csv'; a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >Export Selected</button>
+            <button className="btn-ghost text-xs py-1.5 text-gray-400" onClick={() => setSelected(new Set())}>Clear</button>
+          </div>
+        </div>
+      )}
+
+      <div className="card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="table-header w-10">
+                  <input type="checkbox" checked={allSelected} onChange={toggleAll} className="accent-electric cursor-pointer" title="Select all" />
+                </th>
+                {headers.map(({ label, field, cls }) => (
+                  <th
+                    key={field}
+                    className={cn('table-header cursor-pointer hover:text-white select-none transition-colors', cls)}
+                    onClick={() => toggleSort(field)}
+                  >
+                    {label}
+                    <SortIcon field={field} active={sortField === field} dir={sortDir} />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((p) => {
+                const scoreColor = (p.commitmentScore ?? 0) >= 75
+                  ? 'text-emerald-400' : (p.commitmentScore ?? 0) >= 50
+                  ? 'text-amber-400' : 'text-gray-400';
+                const isSelected = selected.has(p.id);
+                return (
+                  <tr key={p.id} className={cn('table-row', isSelected && 'bg-electric/[0.04]')}>
+                    <td className="table-cell w-10">
+                      <input type="checkbox" checked={isSelected} onChange={() => toggleOne(p.id)} className="accent-electric cursor-pointer" title="Select row" />
+                    </td>
+                    <td className="table-cell">
+                      <Link href={`/crm/${p.id}`} className="flex items-center gap-3 hover:text-electric transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-electric/20 to-emerald-500/20 flex items-center justify-center text-[10px] font-bold text-electric shrink-0">
+                          {getInitials(`${p.firstName} ${p.lastName}`)}
+                        </div>
+                        <span className="font-medium">{p.firstName} {p.lastName}</span>
+                      </Link>
+                    </td>
+                    <td className="table-cell">
+                      <span className="badge-gray text-[10px]">{p.position}</span>
+                    </td>
+                    <td className="table-cell text-gray-400">{p.highSchool || '—'}</td>
+                    <td className="table-cell text-gray-400">{p.classYear}</td>
+                    <td className="table-cell text-gray-400">{p.academics?.gpa?.toFixed(2) || '—'}</td>
+                    <td className="table-cell text-gray-400">{p.stats?.fortyYard || '—'}</td>
+                    <td className="table-cell">
+                      <span className="badge-gray text-[10px]">{p.stage?.name || '—'}</span>
+                    </td>
+                    <td className="table-cell text-right">
+                      <span className={cn('font-bold', scoreColor)}>{p.commitmentScore ?? '—'}</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
