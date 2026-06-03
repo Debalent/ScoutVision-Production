@@ -6,6 +6,8 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Run: npx ts-node --compiler-options '{"module":"CommonJS"}' prisma/seed.ts
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
