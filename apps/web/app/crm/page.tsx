@@ -9,8 +9,44 @@ import Link from 'next/link';
 
 type ViewMode = 'board' | 'table';
 
+// ─── Skeleton ───────────────────────────────────────────────────────
+
+function SkeletonCard() {
+  return (
+    <div className="card-hover p-3 space-y-2 animate-pulse">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-full bg-white/5" />
+        <div className="space-y-1 flex-1">
+          <div className="h-3 bg-white/5 rounded w-24" />
+          <div className="h-2 bg-white/5 rounded w-16" />
+        </div>
+      </div>
+      <div className="h-2 bg-white/5 rounded w-full" />
+      <div className="h-1 bg-white/5 rounded w-full" />
+    </div>
+  );
+}
+
+function KanbanSkeleton() {
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2">
+      {[1,2,3,4,5].map((i) => (
+        <div key={i} className="kanban-column flex-shrink-0 animate-pulse">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+            <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
+            <div className="h-3 bg-white/10 rounded w-20" />
+          </div>
+          <div className="p-2 space-y-2">
+            {[1,2].map((j) => <SkeletonCard key={j} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function CRMPage() {
-  const { prospects: PROSPECTS, openAddModal } = useProspects();
+  const { prospects: PROSPECTS, loading, openAddModal } = useProspects();
   const [view, setView] = useState<ViewMode>('board');
   const [search, setSearch] = useState('');
   const [positionFilter, setPositionFilter] = useState('all');
@@ -29,13 +65,23 @@ export default function CRMPage() {
     return matchesSearch && matchesPosition && matchesStage;
   });
 
+  const hasActiveFilters = search !== '' || positionFilter !== 'all' || stageFilter !== 'all';
+
+  function clearFilters() {
+    setSearch('');
+    setPositionFilter('all');
+    setStageFilter('all');
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="page-title">Recruiting CRM</h1>
-          <p className="text-sm text-gray-500 mt-1">{PROSPECTS.length} prospects in pipeline</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {loading ? 'Loading prospects...' : `${PROSPECTS.length} prospects in pipeline`}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button className="btn-secondary text-sm">
@@ -112,7 +158,37 @@ export default function CRMPage() {
       </div>
 
       {/* Content */}
-      {view === 'board' ? (
+      {loading ? (
+        <KanbanSkeleton />
+      ) : PROSPECTS.length === 0 ? (
+        /* Empty pipeline */
+        <div className="card p-16 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-2xl bg-electric/10 flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-electric">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="9" cy="7" r="4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold mb-2">No prospects yet</h3>
+          <p className="text-sm text-gray-500 mb-6 max-w-sm">Add your first recruit to start building your pipeline. You can import from Hudl or add manually.</p>
+          <button onClick={openAddModal} className="btn-primary text-sm">+ Add First Prospect</button>
+        </div>
+      ) : filtered.length === 0 ? (
+        /* No results after filtering */
+        <div className="card p-12 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-4">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+          </div>
+          <h3 className="text-base font-semibold mb-1">No prospects match your filters</h3>
+          <p className="text-sm text-gray-500 mb-4">Try adjusting your search or clearing the filters.</p>
+          {hasActiveFilters && (
+            <button onClick={clearFilters} className="btn-secondary text-sm">Clear Filters</button>
+          )}
+        </div>
+      ) : view === 'board' ? (
         <KanbanBoard prospects={filtered} stages={STAGES} />
       ) : (
         <ProspectTable prospects={filtered} />
