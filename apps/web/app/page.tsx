@@ -1,3 +1,7 @@
+// ─── ScoutVision Dashboard Entry ───────────────────────────────────
+// This page orchestrates top-level recruiting KPIs and status panels.
+// Data flow: ProspectContext (live/demo) -> cards/tables/charts -> user actions.
+
 'use client';
 
 import StatCard from './components/StatCard';
@@ -5,11 +9,13 @@ import ActivityFeed from './components/ActivityFeed';
 import ComplianceAlert from './components/ComplianceAlert';
 import ProspectCard from './components/ProspectCard';
 import { useProspects } from './components/ProspectContext';
+import DemoModeToggle from './components/DemoModeToggle';
+import { EmptyBlock, ErrorBlock, LoadingBlock } from './components/ui/StateBlock';
 import { DASHBOARD_STATS, RECENT_ACTIVITY, COMPLIANCE_EVENTS, VISITS, STAGES } from './lib/mock-data';
 import { formatDate, pct } from './lib/utils';
 
 export default function DashboardPage() {
-  const { prospects, openAddModal } = useProspects();
+  const { prospects, loading, error, mode, refreshProspects, openAddModal } = useProspects();
   const upcomingVisits = VISITS.filter((v) => v.status === 'scheduled').sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
@@ -17,6 +23,37 @@ export default function DashboardPage() {
     .sort((a, b) => (b.commitmentScore ?? 0) - (a.commitmentScore ?? 0))
     .slice(0, 5);
   const alerts = COMPLIANCE_EVENTS.filter((e) => !e.resolved).slice(0, 4);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <LoadingBlock />
+        <LoadingBlock />
+      </div>
+    );
+  }
+
+  if (error && mode === 'live') {
+    return (
+      <ErrorBlock
+        title="Live API unavailable"
+        description={`${error} You can still explore the full product in Demo Mode.`}
+        actionLabel="Retry"
+        onAction={refreshProspects}
+      />
+    );
+  }
+
+  if (!prospects.length) {
+    return (
+      <EmptyBlock
+        title="No prospects yet"
+        description="Start by adding your first prospect or switch to Demo Mode for a preloaded walkthrough."
+        actionLabel="Add Prospect"
+        onAction={openAddModal}
+      />
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -29,6 +66,10 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <span className={`badge text-[10px] uppercase tracking-wide ${mode === 'demo' ? 'badge-gray' : 'text-emerald-300 bg-emerald-500/15 border-emerald-500/30'}`}>
+            {mode === 'demo' ? 'Demo Data' : 'Live Data'}
+          </span>
+          <DemoModeToggle />
           <button className="btn-secondary text-sm">
             <span className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

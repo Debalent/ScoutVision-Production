@@ -29,6 +29,68 @@ ScoutVision-Production/
     prisma/       -- Database schema (PostgreSQL)
 ```
 
+## How the Code Works
+
+### Architecture Overview
+
+- `apps/web`: Next.js 14 application for all UI pages, local API routes, and presentation layer.
+- `apps/api`: Express API service for authentication, prospects, billing, and compliance endpoints.
+- `packages/ai`: Shared AI/CV runtime package for analysis-related logic.
+- `prisma/schema.prisma`: Canonical data model for prospects, compliance, visits, reports, and pipeline analytics.
+
+### Frontend -> Backend Flow
+
+1. UI pages read state from context providers (`SportContext`, `ProspectContext`, `TeamContext`).
+2. In `Live Mode`, `ProspectContext` calls `/api/prospects` and routes can proxy to the Express API using `NEXT_PUBLIC_API_URL`.
+3. In `Demo Mode`, context short-circuits network dependencies and hydrates the UI from mock datasets.
+4. Mutations use optimistic updates to keep interactions responsive while network calls resolve.
+
+### Component Structure
+
+- Layout shell: `layout.tsx` + `Sidebar` + `TopBar` + provider stack.
+- Feature pages: `crm`, `analytics`, `compliance`, `video`, `reports`, `compare`, and `settings`.
+- Reusable UI: `components/ui` includes modal primitives and state blocks (loading, empty, error).
+- New marketing surface: `app/landing/page.tsx` for investor/buyer walkthroughs.
+
+### State Management Explanation
+
+- React Context is used as the primary state layer:
+  - `SportContext`: active sport, level, and persistent demo/live toggle.
+  - `ProspectContext`: prospect collection, loading/error state, refresh/mutation methods.
+  - `TeamContext`: team profile and collaboration metadata.
+- Demo mode preference persists via `localStorage` so demos survive refreshes.
+
+### API Endpoint List
+
+#### Express API (`apps/api`)
+
+- `GET /health` - Service health check
+- `GET /ping` - Keep-alive endpoint for free-tier hosts
+- `POST /auth/login` - User authentication
+- `POST /auth/register` - User registration
+- `GET /prospects` - List prospects
+- `POST /prospects` - Create prospect
+- `PATCH /prospects/:id` - Update prospect
+- `DELETE /prospects/:id` - Delete prospect
+- `GET /compliance/events` - List compliance events
+- `POST /compliance/events` - Create compliance event
+- `POST /billing/create-checkout-session` - Create Stripe session
+- `TODO: /analysis` - Planned production AI orchestration endpoint
+- `TODO: /reports` - Planned persisted AI reports endpoint
+- `TODO: /search` - Planned NL search endpoint parity
+
+#### Next.js API (`apps/web/app/api`)
+
+- `/api/prospects`
+- `/api/analytics`
+- `/api/compliance/events`
+- `/api/analysis`
+- `/api/reports`
+- `/api/search`
+- `/api/uploads`
+
+These routes currently support a backend-proxy strategy with mock fallbacks so the product remains fully demonstrable pre-deployment.
+
 ---
 
 ## Tech Stack

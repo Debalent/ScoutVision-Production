@@ -6,7 +6,7 @@
 
 'use client';
 
-import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect, type ReactNode } from 'react';
 import { type SportKey, getSportPack, type SportPack, SPORT_LIST } from '../lib/sport-packs';
 import { getLevelPack, type LevelPack, LEVEL_LIST } from '../lib/level-packs';
 import { getDemoProspectsForSport, type DemoProspect } from '../lib/demo-data';
@@ -34,6 +34,7 @@ interface SportContextType {
 }
 
 const SportContext = createContext<SportContextType | undefined>(undefined);
+const DEMO_MODE_STORAGE_KEY = 'scoutvision:demoMode';
 
 // ─── Provider ───────────────────────────────────────────────────────
 
@@ -41,6 +42,19 @@ export function SportProvider({ children }: { children: ReactNode }) {
   const [sport, setSportState] = useState<SportKey>('football');
   const [level, setLevelState] = useState<string>('high_school');
   const [demoMode, setDemoModeState] = useState<boolean>(false);
+
+  // Restore persisted demo mode preference after hydration.
+  useEffect(() => {
+    const saved = window.localStorage.getItem(DEMO_MODE_STORAGE_KEY);
+    if (saved === 'true') {
+      setDemoModeState(true);
+    }
+  }, []);
+
+  // Persist demo mode for consistent demos across refreshes.
+  useEffect(() => {
+    window.localStorage.setItem(DEMO_MODE_STORAGE_KEY, demoMode ? 'true' : 'false');
+  }, [demoMode]);
 
   const setSport = useCallback((s: SportKey) => setSportState(s), []);
   const setLevel = useCallback((l: string) => setLevelState(l), []);

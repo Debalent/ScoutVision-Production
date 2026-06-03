@@ -1,7 +1,10 @@
+// ─── ScoutVision Settings Workspace ────────────────────────────────
+// Tabbed control center for program setup, team management, integrations,
+// notifications, billing controls, and security policy configuration.
+
 'use client';
 
 import { useState } from 'react';
-import Sidebar from '../components/Sidebar';
 import { useTeam } from '../components/TeamContext';
 import { useSport } from '../components/SportContext';
 
@@ -86,27 +89,27 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Program Name</label>
-                  <input type="text" value={programName} onChange={(e) => setProgramName(e.target.value)} className="input-field w-full" />
+                  <input title="Program Name" type="text" value={programName} onChange={(e) => setProgramName(e.target.value)} className="input-field w-full" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Sport</label>
-                  <select value={sport} onChange={(e) => { setSport(e.target.value); const found = sportList.find((s) => s.label === e.target.value); if (found) setCtxSport(found.key); }} className="input-field w-full">
+                  <select title="Sport" value={sport} onChange={(e) => { setSport(e.target.value); const found = sportList.find((s) => s.label === e.target.value); if (found) setCtxSport(found.key); }} className="input-field w-full">
                     <option>Football</option><option>Basketball</option><option>Baseball</option><option>Soccer</option><option>Hockey</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Division</label>
-                  <select value={division} onChange={(e) => setDivision(e.target.value)} className="input-field w-full">
+                  <select title="Division" value={division} onChange={(e) => setDivision(e.target.value)} className="input-field w-full">
                     <option>Division I</option><option>Division II</option><option>Division III</option><option>NAIA</option><option>JUCO</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Conference</label>
-                  <input type="text" value={conference} onChange={(e) => setConference(e.target.value)} className="input-field w-full" />
+                  <input title="Conference" type="text" value={conference} onChange={(e) => setConference(e.target.value)} className="input-field w-full" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1.5">Timezone</label>
-                  <select value={timezone} onChange={(e) => setTimezone(e.target.value)} className="input-field w-full">
+                  <select title="Timezone" value={timezone} onChange={(e) => setTimezone(e.target.value)} className="input-field w-full">
                     <option value="America/New_York">Eastern (ET)</option>
                     <option value="America/Chicago">Central (CT)</option>
                     <option value="America/Denver">Mountain (MT)</option>
@@ -418,7 +421,7 @@ export default function SettingsPage() {
                       <div className="font-medium text-white text-sm">Session Management</div>
                       <p className="text-xs text-gray-400 mt-0.5">Auto-logout after 30 minutes of inactivity</p>
                     </div>
-                    <select className="input-field text-xs py-1.5 px-3">
+                    <select title="Notification timing" className="input-field text-xs py-1.5 px-3">
                       <option>15 minutes</option>
                       <option>30 minutes</option>
                       <option>1 hour</option>

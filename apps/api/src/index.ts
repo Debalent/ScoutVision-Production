@@ -1,3 +1,7 @@
+// ─── ScoutVision API Gateway ───────────────────────────────────────
+// Express entrypoint that wires route modules, security middleware, and health probes.
+// Frontend API routes proxy here when NEXT_PUBLIC_API_URL points to this service.
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -60,6 +64,10 @@ app.use('/auth', authRoutes);
 app.use('/prospects', prospectsRoutes);
 app.use('/compliance', complianceRoutes);
 app.use('/billing', billingRoutes);
+
+// TODO(api): Implement /analysis routes in Express for production AI job orchestration.
+// TODO(api): Implement /reports persistence routes for generated scouting reports.
+// TODO(api): Implement /search endpoint parity with the web-side API stub.
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
