@@ -1,24 +1,40 @@
 'use client';
 
-import { useState } from 'react';
-import { COMPLIANCE_EVENTS, RECRUITING_PERIODS, VISITS, PROSPECTS } from '../lib/mock-data';
+import { useState, useEffect } from 'react';
+import {
+  COMPLIANCE_EVENTS as FALLBACK_EVENTS,
+  RECRUITING_PERIODS,
+  VISITS,
+  PROSPECTS,
+} from '../lib/mock-data';
 import ComplianceAlert from '../components/ComplianceAlert';
 import { cn, formatDate, periodColor } from '../lib/utils';
-import type { RecruitingPeriodType } from '../lib/types';
+import type { ComplianceEvent, RecruitingPeriodType } from '../lib/types';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function CompliancePage() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'alerts' | 'contacts'>('calendar');
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
+  const [events, setEvents] = useState<ComplianceEvent[]>(FALLBACK_EVENTS);
+
+  useEffect(() => {
+    fetch('/api/compliance/events')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setEvents(data);
+        else if (data?.events && Array.isArray(data.events) && data.events.length > 0) setEvents(data.events);
+      })
+      .catch(() => { /* keep fallback */ });
+  }, []);
 
   const alerts = filterSeverity === 'all'
-    ? COMPLIANCE_EVENTS
-    : COMPLIANCE_EVENTS.filter((e) => e.severity === filterSeverity);
+    ? events
+    : events.filter((e) => e.severity === filterSeverity);
 
-  const unresolvedCount = COMPLIANCE_EVENTS.filter((e) => !e.resolved).length;
-  const warningCount = COMPLIANCE_EVENTS.filter((e) => e.severity === 'warning').length;
-  const violationCount = COMPLIANCE_EVENTS.filter((e) => e.severity === 'violation').length;
+  const unresolvedCount = events.filter((e) => !e.resolved).length;
+  const warningCount    = events.filter((e) => e.severity === 'warning').length;
+  const violationCount  = events.filter((e) => e.severity === 'violation').length;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -245,7 +261,7 @@ function AlertsView({
   filterSeverity,
   onFilterChange,
 }: {
-  alerts: typeof COMPLIANCE_EVENTS;
+  alerts: ComplianceEvent[];
   filterSeverity: string;
   onFilterChange: (v: string) => void;
 }) {
@@ -269,7 +285,7 @@ function AlertsView({
 
       {/* Events */}
       <div className="space-y-2">
-        {alerts.map((event) => (
+        {alerts.map((event: ComplianceEvent) => (
           <ComplianceAlert key={event.id} event={event} />
         ))}
       </div>
