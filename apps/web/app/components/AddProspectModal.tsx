@@ -16,7 +16,7 @@ const POSITIONS = ['QB','RB','WR','TE','OL','DL','DE','DT','LB','CB','S','K','P'
 const CLASS_YEARS = [2025, 2026, 2027, 2028, 2029];
 
 export default function AddProspectModal() {
-  const { showAddModal, closeAddModal, addProspect } = useProspects();
+  const { showAddModal, closeAddModal, addProspect, prospects } = useProspects();
   const modalRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -42,6 +42,7 @@ export default function AddProspectModal() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
 
   // Focus first input on open
   useEffect(() => {
@@ -85,10 +86,30 @@ export default function AddProspectModal() {
     setErrors({}); setSubmitted(false);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent, force = false) {
     e.preventDefault();
     setSubmitted(true);
     if (!validate()) return;
+
+    // Duplicate detection (skip when forced)
+    if (!force) {
+      const nameMatch = prospects.find(
+        (p) => p.firstName.toLowerCase() === firstName.trim().toLowerCase() &&
+               p.lastName.toLowerCase() === lastName.trim().toLowerCase()
+      );
+      const emailMatch = email.trim()
+        ? prospects.find((p) => p.email && p.email.toLowerCase() === email.trim().toLowerCase())
+        : null;
+      if (emailMatch) {
+        setDuplicateWarning(`A prospect with this email already exists: ${emailMatch.firstName} ${emailMatch.lastName}`);
+        return;
+      }
+      if (nameMatch) {
+        setDuplicateWarning(`A prospect with this name already exists: ${nameMatch.firstName} ${nameMatch.lastName}`);
+        return;
+      }
+    }
+    setDuplicateWarning(null);
 
     const stage = STAGES.find((s) => s.id === stageId) || STAGES[0];
     const newProspect: Prospect = {
@@ -408,6 +429,13 @@ export default function AddProspectModal() {
         </form>
 
         {/* Footer */}
+        {duplicateWarning && (
+          <div className="mx-6 mb-2 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>{duplicateWarning} — you can still add if this is intentional.</span>
+            <button type="button" onClick={() => setDuplicateWarning(null)} className="ml-auto shrink-0 text-amber-400 hover:text-white" title="Dismiss">✕</button>
+          </div>
+        )}
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/5 bg-charcoal/50">
           <button
             type="button"
@@ -418,14 +446,14 @@ export default function AddProspectModal() {
           </button>
           <button
             type="submit"
-            onClick={handleSubmit}
+            onClick={duplicateWarning ? (e) => handleSubmit(e, true) : handleSubmit}
             className="btn-primary text-sm px-5"
           >
             <span className="flex items-center gap-2">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14" /><path d="M5 12h14" />
               </svg>
-              Add Prospect
+              {duplicateWarning ? 'Add Anyway' : 'Add Prospect'}
             </span>
           </button>
         </div>
