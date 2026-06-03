@@ -139,7 +139,7 @@ async function main() {
       isActive: true,
       lastLoginAt: new Date('2026-06-01T14:00:00Z'),
       mfaEnabled: true,
-      mfaSecret: 'JBSWY3DPEHPK3PXP',
+      mfaSecret: process.env.SEED_MFA_SECRET ?? '',
       preferences: { theme: 'dark', notifications: true },
     },
   });

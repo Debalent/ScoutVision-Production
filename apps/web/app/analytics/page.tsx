@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
           <p className="text-sm text-gray-500 mt-1">Pipeline performance, geographic insights, and predictive scoring</p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="input w-auto py-2 text-sm bg-navy/50">
+          <select title="Select time range" className="input w-auto py-2 text-sm bg-navy/50">
             <option>2025-2026 Cycle</option>
             <option>2024-2025 Cycle</option>
           </select>

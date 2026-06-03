@@ -155,9 +155,10 @@ export default function AIAnalysisPanel({ videoId }: { videoId: string }) {
 
         {/* Pipeline stages */}
         <div className="grid grid-cols-5 gap-1 mt-2">
-          {Object.entries(STAGE_LABELS).filter(([k]) => k !== 'queued' && k !== 'complete').map(([key, label]) => {
+          {(() => {
             const stageKeys = Object.keys(STAGE_LABELS).filter(k => k !== 'queued' && k !== 'complete');
             const currentIdx = stageKeys.indexOf(job.stage);
+            return Object.entries(STAGE_LABELS).filter(([k]) => k !== 'queued' && k !== 'complete').map(([key, label]) => {
             const thisIdx = stageKeys.indexOf(key);
             const isDone = thisIdx < currentIdx;
             const isCurrent = key === job.stage;
@@ -173,7 +174,8 @@ export default function AIAnalysisPanel({ videoId }: { videoId: string }) {
                 )}>{label.split(' ').slice(0, 2).join(' ')}</span>
               </div>
             );
-          })}
+          });
+          })()}
         </div>
       </div>
     );

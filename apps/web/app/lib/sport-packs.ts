@@ -56,13 +56,23 @@ export interface SportPack {
   roleFitCategories: string[];
 }
 
+// ─── Sport Brand Colors ─────────────────────────────────────────────
+
+export const SPORT_COLORS: Record<SportKey, string> = {
+  football:   process.env.NEXT_PUBLIC_COLOR_FOOTBALL   ?? '#8B4513',
+  basketball: process.env.NEXT_PUBLIC_COLOR_BASKETBALL ?? '#FF6B00',
+  baseball:   process.env.NEXT_PUBLIC_COLOR_BASEBALL   ?? '#C41E3A',
+  soccer:     process.env.NEXT_PUBLIC_COLOR_SOCCER     ?? '#00A859',
+  hockey:     process.env.NEXT_PUBLIC_COLOR_HOCKEY     ?? '#005EB8',
+};
+
 // ─── Football Pack ──────────────────────────────────────────────────
 
 export const FOOTBALL_PACK: SportPack = {
   key: 'football',
   label: 'Football',
   icon: '🏈',
-  color: '#8B4513',
+  color: SPORT_COLORS.football,
   measurables: [
     { key: 'height', label: 'Height', unit: 'in', higherBetter: true },
     { key: 'weight', label: 'Weight', unit: 'lbs', higherBetter: true },
@@ -122,7 +132,7 @@ export const BASKETBALL_PACK: SportPack = {
   key: 'basketball',
   label: 'Basketball',
   icon: '🏀',
-  color: '#FF6B00',
+  color: SPORT_COLORS.basketball,
   measurables: [
     { key: 'height', label: 'Height', unit: 'in', higherBetter: true },
     { key: 'wingspan', label: 'Wingspan', unit: 'in', higherBetter: true },
@@ -177,7 +187,7 @@ export const BASEBALL_PACK: SportPack = {
   key: 'baseball',
   label: 'Baseball',
   icon: '⚾',
-  color: '#C41E3A',
+  color: SPORT_COLORS.baseball,
   measurables: [
     { key: 'height', label: 'Height', unit: 'in', higherBetter: true },
     { key: 'weight', label: 'Weight', unit: 'lbs', higherBetter: true },
@@ -231,7 +241,7 @@ export const SOCCER_PACK: SportPack = {
   key: 'soccer',
   label: 'Soccer',
   icon: '⚽',
-  color: '#00A859',
+  color: SPORT_COLORS.soccer,
   measurables: [
     { key: 'speed', label: 'Top Speed', unit: 'mph', higherBetter: true },
     { key: 'stamina', label: 'Stamina (VO2max)', unit: 'ml/kg/min', higherBetter: true },
@@ -283,7 +293,7 @@ export const HOCKEY_PACK: SportPack = {
   key: 'hockey',
   label: 'Hockey',
   icon: '🏒',
-  color: '#005EB8',
+  color: SPORT_COLORS.hockey,
   measurables: [
     { key: 'height', label: 'Height', unit: 'in', higherBetter: true },
     { key: 'weight', label: 'Weight', unit: 'lbs', higherBetter: true },

@@ -127,6 +127,7 @@ export default function CRMPage() {
 
         {/* Position Filter */}
         <select
+          title="Filter by position"
           value={positionFilter}
           onChange={(e) => setPositionFilter(e.target.value)}
           className="input w-auto py-2 text-sm bg-navy/50"
@@ -139,6 +140,7 @@ export default function CRMPage() {
 
         {/* Stage Filter */}
         <select
+          title="Filter by stage"
           value={stageFilter}
           onChange={(e) => setStageFilter(e.target.value)}
           className="input w-auto py-2 text-sm bg-navy/50"

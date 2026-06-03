@@ -15,13 +15,26 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
+function isSafeApiUrl(url: string): boolean {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    const allowed = (process.env.ALLOWED_API_HOST || 'localhost').split(',').map((h) => h.trim());
+    return allowed.includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+const VALIDATED_API_URL = isSafeApiUrl(API_URL) ? API_URL : '';
+
 export async function GET() {
   // When the Express API is available, proxy to it
-  if (API_URL) {
+  if (VALIDATED_API_URL) {
     try {
       const [prospectsRes, metricsRes] = await Promise.all([
-        fetch(`${API_URL}/prospects`),
-        fetch(`${API_URL}/analytics/metrics`),
+        fetch(`${VALIDATED_API_URL}/prospects`),
+        fetch(`${VALIDATED_API_URL}/analytics/metrics`),
       ]);
       if (prospectsRes.ok) {
         const prospects = await prospectsRes.json();
