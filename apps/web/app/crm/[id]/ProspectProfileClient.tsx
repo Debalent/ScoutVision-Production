@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { PROSPECTS, NOTES, EVALUATIONS, VIDEOS, VISITS } from '../../lib/mock-data';
 import { cn, getInitials, formatDate, timeAgo } from '../../lib/utils';
 import Link from 'next/link';
-import type { Note, Evaluation } from '../../lib/types';
+import type { Note, Evaluation, Visit, ContactLog } from '../../lib/types';
 
 // ─── Rate Modal ──────────────────────────────────────────────────────
 
@@ -104,6 +104,116 @@ function RateModal({ prospectId, onClose, onSave }: {
   );
 }
 
+// ─── Schedule Visit Modal ───────────────────────────────────────────
+
+function ScheduleVisitModal({ prospectId, onClose, onSave }: {
+  prospectId: string;
+  onClose: () => void;
+  onSave: (v: Visit) => void;
+}) {
+  const [type, setType] = useState<'official' | 'unofficial' | 'junior_day'>('official');
+  const [date, setDate] = useState('');
+  const [location, setLocation] = useState('');
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!date) return;
+    setSaving(true);
+    const visit: Visit = {
+      id: `visit_${Date.now()}`,
+      type,
+      date,
+      location: location.trim() || null,
+      notes: notes.trim() || null,
+      status: 'scheduled',
+      prospectId,
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      await fetch(`/api/prospects/${prospectId}/visits`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(visit),
+      });
+    } catch { /* optimistic */ }
+    onSave(visit);
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4" onClick={onClose}>
+      <div className="w-full max-w-md bg-charcoal border border-white/10 rounded-2xl shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <h3 className="text-base font-semibold">Schedule Visit</h3>
+          <button onClick={onClose} title="Close" className="p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Visit Type</label>
+            <div className="flex gap-2">
+              {(['official', 'unofficial', 'junior_day'] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setType(t)}
+                  className={cn(
+                    'flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all border',
+                    type === t
+                      ? 'bg-electric/20 border-electric/40 text-electric'
+                      : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                  )}
+                >
+                  {t.replace('_', ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Date <span className="text-red-400">*</span></label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="input py-2 text-sm w-full"
+              title="Visit date"
+              required
+            />
+          </div>
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Location</label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g. Campus, Memorial Stadium"
+              className="input py-2 text-sm w-full"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Notes</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Any additional notes..."
+              className="input min-h-[70px] resize-none text-sm w-full"
+            />
+          </div>
+          <div className="flex gap-3 justify-end pt-2">
+            <button type="button" onClick={onClose} className="btn-secondary text-sm">Cancel</button>
+            <button type="submit" disabled={saving || !date} className="btn-primary text-sm disabled:opacity-50">
+              {saving ? 'Scheduling...' : 'Schedule Visit'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function ProspectProfileClient({ params }: { params: { id: string } }) {
   const prospect = PROSPECTS.find((p) => p.id === params.id);
 
@@ -122,8 +232,42 @@ export default function ProspectProfileClient({ params }: { params: { id: string
   const [noteText, setNoteText] = useState('');
   const [submittingNote, setSubmittingNote] = useState(false);
   const [showRateModal, setShowRateModal] = useState(false);
+  const [showVisitModal, setShowVisitModal] = useState(false);
   const videos = VIDEOS.filter((v) => v.prospectId === prospect.id);
-  const visits = VISITS.filter((v) => v.prospectId === prospect.id);
+  const [visits, setVisits] = useState<Visit[]>(VISITS.filter((v) => v.prospectId === prospect.id));
+  const [contactLogs, setContactLogs] = useState<ContactLog[]>(prospect.contactLogs ?? []);
+  const [logType, setLogType] = useState<ContactLog['type']>('call');
+  const [logDirection, setLogDirection] = useState<'inbound' | 'outbound'>('outbound');
+  const [logSummary, setLogSummary] = useState('');
+  const [logDuration, setLogDuration] = useState('');
+  const [submittingLog, setSubmittingLog] = useState(false);
+
+  async function handleAddContactLog(e: React.FormEvent) {
+    e.preventDefault();
+    if (!logSummary.trim()) return;
+    setSubmittingLog(true);
+    const log: ContactLog = {
+      id: `log_${Date.now()}`,
+      type: logType,
+      direction: logDirection,
+      summary: logSummary.trim(),
+      duration: logDuration ? Number(logDuration) : null,
+      prospectId: prospect.id,
+      userId: 'u1',
+      occurredAt: new Date().toISOString(),
+    };
+    setContactLogs((prev) => [log, ...prev]);
+    setLogSummary('');
+    setLogDuration('');
+    try {
+      await fetch(`/api/prospects/${prospect.id}/contact-logs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(log),
+      });
+    } catch { /* optimistic */ }
+    setSubmittingLog(false);
+  }
 
   async function handleAddNote(e: React.FormEvent) {
     e.preventDefault();
@@ -316,7 +460,17 @@ export default function ProspectProfileClient({ params }: { params: { id: string
           </div>
 
           <div className="card p-5">
-            <h2 className="section-title mb-4">Visits</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="section-title">Visits</h2>
+              <button className="btn-secondary text-xs py-1.5" onClick={() => setShowVisitModal(true)}>+ Schedule</button>
+            </div>
+            {showVisitModal && (
+              <ScheduleVisitModal
+                prospectId={prospect.id}
+                onClose={() => setShowVisitModal(false)}
+                onSave={(v) => setVisits((prev) => [v, ...prev])}
+              />
+            )}
             {visits.length === 0 ? (
               <p className="text-sm text-gray-500 text-center py-4">No visits scheduled</p>
             ) : (
@@ -340,6 +494,81 @@ export default function ProspectProfileClient({ params }: { params: { id: string
                     )}>
                       {v.status}
                     </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="card p-5">
+            <h2 className="section-title mb-4">Contact Log</h2>
+            <form onSubmit={handleAddContactLog} className="space-y-3 mb-4">
+              <div className="flex gap-2">
+                <select
+                  value={logType}
+                  onChange={(e) => setLogType(e.target.value as ContactLog['type'])}
+                  className="input py-1.5 text-xs flex-1"
+                  title="Contact type"
+                >
+                  {(['call', 'text', 'in-person', 'social', 'mail'] as const).map((t) => (
+                    <option key={t} value={t}>{t.replace('-', ' ')}</option>
+                  ))}
+                </select>
+                <select
+                  value={logDirection}
+                  onChange={(e) => setLogDirection(e.target.value as 'inbound' | 'outbound')}
+                  className="input py-1.5 text-xs w-28"
+                  title="Direction"
+                >
+                  <option value="outbound">Outbound</option>
+                  <option value="inbound">Inbound</option>
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={logSummary}
+                  onChange={(e) => setLogSummary(e.target.value)}
+                  placeholder="Summary..."
+                  className="input py-1.5 text-xs flex-1"
+                />
+                <input
+                  type="number"
+                  value={logDuration}
+                  onChange={(e) => setLogDuration(e.target.value)}
+                  placeholder="min"
+                  min={0}
+                  className="input py-1.5 text-xs w-16 text-center"
+                  title="Duration in minutes"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={submittingLog || !logSummary.trim()}
+                className="btn-secondary text-xs py-1.5 w-full disabled:opacity-40"
+              >
+                Log Contact
+              </button>
+            </form>
+            {contactLogs.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-2">No contact logs yet</p>
+            ) : (
+              <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                {contactLogs.map((log) => (
+                  <div key={log.id} className="flex items-start gap-3 rounded-xl p-3 bg-white/[0.02] border border-white/5">
+                    <div className="mt-0.5 w-6 h-6 rounded-full bg-electric/10 flex items-center justify-center shrink-0">
+                      <span className="text-[9px] font-bold text-electric uppercase">{log.type[0]}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium capitalize">{log.type.replace('-', ' ')}</span>
+                        <span className="text-[10px] text-gray-600">·</span>
+                        <span className={cn('text-[10px] capitalize', log.direction === 'inbound' ? 'text-emerald-400' : 'text-electric')}>{log.direction}</span>
+                        {log.duration && <span className="text-[10px] text-gray-500 ml-auto">{log.duration}m</span>}
+                      </div>
+                      {log.summary && <p className="text-xs text-gray-400 mt-0.5 truncate">{log.summary}</p>}
+                      <p className="text-[10px] text-gray-600 mt-0.5">{timeAgo(log.occurredAt)}</p>
+                    </div>
                   </div>
                 ))}
               </div>
