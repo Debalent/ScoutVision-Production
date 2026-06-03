@@ -13,10 +13,125 @@ import type { ComplianceEvent, RecruitingPeriodType } from '../lib/types';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+// ─── Log Event Modal ────────────────────────────────────────────────
+
+function LogEventModal({ onClose, onSave }: {
+  onClose: () => void;
+  onSave: (ev: ComplianceEvent) => void;
+}) {
+  const [type, setType] = useState('contact_violation');
+  const [severity, setSeverity] = useState<'info' | 'warning' | 'violation'>('info');
+  const [description, setDescription] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!description.trim()) return;
+    setSaving(true);
+    const ev: ComplianceEvent = {
+      id: `ce_${Date.now()}`,
+      type,
+      title: type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      details: description.trim(),
+      severity,
+      resolved: false,
+      programId: 'p1',
+      userId: 'u1',
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      await fetch('/api/compliance/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ev),
+      });
+    } catch { /* optimistic */ }
+    onSave(ev);
+    onClose();
+  }
+
+  const EVENT_TYPES = [
+    { value: 'contact_violation', label: 'Contact Violation' },
+    { value: 'dead_period_contact', label: 'Dead Period Contact' },
+    { value: 'impermissible_benefit', label: 'Impermissible Benefit' },
+    { value: 'visit_issue', label: 'Visit Issue' },
+    { value: 'communication_issue', label: 'Communication Issue' },
+    { value: 'eligibility_concern', label: 'Eligibility Concern' },
+    { value: 'other', label: 'Other' },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4" onClick={onClose}>
+      <div className="w-full max-w-md bg-charcoal border border-white/10 rounded-2xl shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <h3 className="text-base font-semibold">Log Compliance Event</h3>
+          <button onClick={onClose} title="Close" className="p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Event Type</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="input py-2 text-sm w-full bg-navy/50"
+              title="Event type"
+            >
+              {EVENT_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Severity</label>
+            <div className="flex gap-2">
+              {(['info', 'warning', 'violation'] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSeverity(s)}
+                  className={cn(
+                    'flex-1 py-2 rounded-lg text-xs font-medium capitalize transition-all border',
+                    severity === s
+                      ? s === 'info' ? 'bg-blue-500/20 border-blue-500/40 text-blue-300'
+                        : s === 'warning' ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
+                        : 'bg-red-500/20 border-red-500/40 text-red-300'
+                      : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Description <span className="text-red-400">*</span></label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe the compliance event..."
+              className="input min-h-[90px] resize-none text-sm w-full"
+              required
+            />
+          </div>
+          <div className="flex gap-3 justify-end pt-2">
+            <button type="button" onClick={onClose} className="btn-secondary text-sm">Cancel</button>
+            <button type="submit" disabled={saving || !description.trim()} className="btn-primary text-sm disabled:opacity-50">
+              {saving ? 'Logging...' : 'Log Event'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function CompliancePage() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'alerts' | 'contacts'>('calendar');
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
   const [events, setEvents] = useState<ComplianceEvent[]>(FALLBACK_EVENTS);
+  const [showLogModal, setShowLogModal] = useState(false);
 
   useEffect(() => {
     fetch('/api/compliance/events')
@@ -44,8 +159,15 @@ export default function CompliancePage() {
           <h1 className="page-title">Compliance Center</h1>
           <p className="text-sm text-gray-500 mt-1">NCAA recruiting period management & compliance tracking</p>
         </div>
-        <button className="btn-primary text-sm">+ Log Event</button>
+        <button className="btn-primary text-sm" onClick={() => setShowLogModal(true)}>+ Log Event</button>
       </div>
+
+      {showLogModal && (
+        <LogEventModal
+          onClose={() => setShowLogModal(false)}
+          onSave={(ev) => setEvents((prev) => [ev, ...prev])}
+        />
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
