@@ -37,6 +37,121 @@ const RECRUITING_METRICS: CompareMetric[] = [
   { label: 'Status', getValue: (p) => p.status, format: 'text' },
 ];
 
+// ─── Radar Chart ────────────────────────────────────────────────────
+
+const RADAR_AXES = [
+  { label: 'Speed', key: 'speed' },
+  { label: 'Strength', key: 'bench' },
+  { label: 'Power', key: 'squat' },
+  { label: 'Explosion', key: 'vertical' },
+  { label: 'Agility', key: 'agility' },
+  { label: 'Academics', key: 'gpa' },
+];
+
+function getRadarScore(p: Prospect, key: string): number {
+  switch (key) {
+    case 'speed': { const v = p.stats?.fortyYard; return v ? Math.max(0, Math.min(100, (6.0 - v) / (6.0 - 4.2) * 100)) : 0; }
+    case 'bench': { const v = p.stats?.bench; return v ? Math.min(100, (v / 40) * 100) : 0; }
+    case 'squat': { const v = p.stats?.squat; return v ? Math.min(100, (v / 600) * 100) : 0; }
+    case 'vertical': { const v = p.stats?.vertical; return v ? Math.min(100, (v / 48) * 100) : 0; }
+    case 'agility': { const v = p.stats?.shuttle; return v ? Math.max(0, Math.min(100, (5.5 - v) / (5.5 - 3.8) * 100)) : 0; }
+    case 'gpa': { const v = p.academics?.gpa; return v ? Math.min(100, (v / 4.0) * 100) : 0; }
+    default: return 0;
+  }
+}
+
+function RadarChart({ prospects }: { prospects: Prospect[] }) {
+  const SIZE = 260;
+  const cx = SIZE / 2;
+  const cy = SIZE / 2;
+  const R = 100;
+  const n = RADAR_AXES.length;
+  const COLORS = ['#00D4AA', '#a78bfa', '#fbbf24', '#34d399'];
+  const STROKES = ['#00D4AA', '#a78bfa', '#fbbf24', '#34d399'];
+
+  function point(angle: number, r: number) {
+    const a = angle - Math.PI / 2;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  }
+
+  const axisAngles = RADAR_AXES.map((_, i) => (2 * Math.PI * i) / n);
+
+  function polygon(scores: number[], alpha: number, fill: string, stroke: string) {
+    const pts = axisAngles.map((a, i) => {
+      const r = (scores[i] / 100) * R;
+      const { x, y } = point(a, r);
+      return `${x},${y}`;
+    }).join(' ');
+    return (
+      <polygon
+        key={fill + alpha}
+        points={pts}
+        fill={fill}
+        fillOpacity={alpha}
+        stroke={stroke}
+        strokeWidth={1.5}
+        strokeOpacity={0.8}
+      />
+    );
+  }
+
+  const gridLevels = [20, 40, 60, 80, 100];
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} className="overflow-visible">
+        {/* Grid rings */}
+        {gridLevels.map((level) =>
+          axisAngles.map((a, i) => {
+            const next = axisAngles[(i + 1) % n];
+            const p1 = point(a, (level / 100) * R);
+            const p2 = point(next, (level / 100) * R);
+            return <line key={`${level}-${i}`} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="rgba(255,255,255,0.07)" strokeWidth={1} />;
+          })
+        )}
+        {/* Axis lines */}
+        {axisAngles.map((a, i) => {
+          const { x, y } = point(a, R);
+          return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,0.1)" strokeWidth={1} />;
+        })}
+        {/* Prospect polygons */}
+        {prospects.map((p, pi) => {
+          const scores = RADAR_AXES.map(({ key }) => getRadarScore(p, key));
+          return polygon(scores, 0.15, COLORS[pi], STROKES[pi]);
+        })}
+        {/* Axis labels */}
+        {axisAngles.map((a, i) => {
+          const LABEL_R = R + 20;
+          const { x, y } = point(a, LABEL_R);
+          return (
+            <text
+              key={i}
+              x={x}
+              y={y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={9}
+              fill="rgba(255,255,255,0.5)"
+              fontFamily="sans-serif"
+            >
+              {RADAR_AXES[i].label}
+            </text>
+          );
+        })}
+      </svg>
+      {/* Legend */}
+      <div className="flex flex-wrap justify-center gap-4">
+        {prospects.map((p, i) => (
+          <div key={p.id} className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: COLORS[i], opacity: 0.9 }} />
+            <span className="text-xs text-gray-400">{p.firstName} {p.lastName}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ComparePage() {
   const [selectedIds, setSelectedIds] = useState<string[]>(['pr1', 'pr3']);
   const [showSelector, setShowSelector] = useState(false);
@@ -165,40 +280,11 @@ export default function ComparePage() {
         </div>
       </div>
 
-      {/* Radar Chart Placeholder */}
+      {/* Radar Chart + Evaluation Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card p-6">
-          <h3 className="section-title mb-4">Athletic Profile Comparison</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {ATHLETIC_METRICS.map((metric) => {
-              const values = selectedProspects.map((p) => Number(metric.getValue(p)) || 0);
-              const maxVal = Math.max(...values, 1);
-              return (
-                <div key={metric.label} className="rounded-xl bg-white/[0.02] border border-white/5 p-3">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">{metric.label}</p>
-                  <div className="space-y-1.5">
-                    {selectedProspects.map((p, i) => {
-                      const val = Number(metric.getValue(p)) || 0;
-                      const barPct = (val / maxVal) * 100;
-                      const colors = ['bg-electric', 'bg-purple-400', 'bg-amber-400', 'bg-emerald-400'];
-                      return (
-                        <div key={p.id} className="flex items-center gap-2">
-                          <span className="text-[10px] text-gray-500 w-5 shrink-0">{getInitials(`${p.firstName} ${p.lastName}`)}</span>
-                          <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                            <div
-                              className={cn('h-full rounded-full transition-all duration-700', colors[i])}
-                              style={{ width: `${barPct}%`, opacity: 0.7 }}
-                            />
-                          </div>
-                          <span className="text-[10px] font-medium text-gray-400 w-10 text-right">{val || '—'}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <h3 className="section-title mb-4">Athletic Profile Radar</h3>
+          <RadarChart prospects={selectedProspects} />
         </div>
 
         <div className="card p-6">
