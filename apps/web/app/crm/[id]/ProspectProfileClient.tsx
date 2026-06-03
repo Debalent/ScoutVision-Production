@@ -1,8 +1,108 @@
 'use client';
 
+import { useState } from 'react';
 import { PROSPECTS, NOTES, EVALUATIONS, VIDEOS, VISITS } from '../../lib/mock-data';
 import { cn, getInitials, formatDate, timeAgo } from '../../lib/utils';
 import Link from 'next/link';
+import type { Note, Evaluation } from '../../lib/types';
+
+// ─── Rate Modal ──────────────────────────────────────────────────────
+
+function RateModal({ prospectId, onClose, onSave }: {
+  prospectId: string;
+  onClose: () => void;
+  onSave: (ev: Evaluation) => void;
+}) {
+  const [athleticism, setAthleticism] = useState(7);
+  const [skill, setSkill] = useState(7);
+  const [academics, setAcademics] = useState(7);
+  const [character, setCharacter] = useState(7);
+  const [comment, setComment] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const overall = Math.round((athleticism + skill + academics + character) / 4 * 10) / 10;
+
+  async function handleSave() {
+    setSaving(true);
+    const ev: Evaluation = {
+      id: `ev_${Date.now()}`,
+      overallScore: overall,
+      athleticism,
+      skillLevel: skill,
+      academics,
+      character,
+      comment: comment.trim() || null,
+      authorId: 'u1',
+      authorName: 'Coach Rivera',
+      prospectId,
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      await fetch(`/api/prospects/${prospectId}/evaluations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ev),
+      });
+    } catch { /* use optimistic update */ }
+    onSave(ev);
+    onClose();
+  }
+
+  const sliders: { label: string; value: number; set: (v: number) => void }[] = [
+    { label: 'Athleticism', value: athleticism, set: setAthleticism },
+    { label: 'Skill Level', value: skill, set: setSkill },
+    { label: 'Academics', value: academics, set: setAcademics },
+    { label: 'Character', value: character, set: setCharacter },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4" onClick={onClose}>
+      <div className="w-full max-w-md bg-charcoal border border-white/10 rounded-2xl shadow-2xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+          <h3 className="text-base font-semibold">Rate Prospect</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div className="px-6 py-5 space-y-5">
+          <div className="text-center">
+            <span className="text-4xl font-bold text-electric">{overall}</span>
+            <span className="text-gray-400 text-sm ml-1">/ 10 overall</span>
+          </div>
+          {sliders.map(({ label, value, set }) => (
+            <div key={label}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-300">{label}</span>
+                <span className="text-sm font-bold text-electric">{value}</span>
+              </div>
+              <input
+                type="range" min={1} max={10} step={1} value={value}
+                onChange={(e) => set(Number(e.target.value))}
+                className="w-full accent-electric cursor-pointer"
+              />
+              <div className="flex justify-between text-[10px] text-gray-600 mt-0.5"><span>1</span><span>10</span></div>
+            </div>
+          ))}
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">Notes (optional)</label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add evaluation notes..."
+              className="input min-h-[70px] resize-none text-sm w-full"
+            />
+          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-white/5 flex gap-3 justify-end">
+          <button onClick={onClose} className="btn-secondary text-sm">Cancel</button>
+          <button onClick={handleSave} disabled={saving} className="btn-primary text-sm">
+            {saving ? 'Saving...' : 'Save Evaluation'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ProspectProfileClient({ params }: { params: { id: string } }) {
   const prospect = PROSPECTS.find((p) => p.id === params.id);
@@ -17,10 +117,39 @@ export default function ProspectProfileClient({ params }: { params: { id: string
   }
 
   const fullName = `${prospect.firstName} ${prospect.lastName}`;
-  const notes = NOTES.filter((n) => n.prospectId === prospect.id);
-  const evals = EVALUATIONS.filter((e) => e.prospectId === prospect.id);
+  const [notes, setNotes] = useState<Note[]>(NOTES.filter((n) => n.prospectId === prospect.id));
+  const [evals, setEvals] = useState<Evaluation[]>(EVALUATIONS.filter((e) => e.prospectId === prospect.id));
+  const [noteText, setNoteText] = useState('');
+  const [submittingNote, setSubmittingNote] = useState(false);
+  const [showRateModal, setShowRateModal] = useState(false);
   const videos = VIDEOS.filter((v) => v.prospectId === prospect.id);
   const visits = VISITS.filter((v) => v.prospectId === prospect.id);
+
+  async function handleAddNote(e: React.FormEvent) {
+    e.preventDefault();
+    if (!noteText.trim()) return;
+    setSubmittingNote(true);
+    const newNote: Note = {
+      id: `note_${Date.now()}`,
+      content: noteText.trim(),
+      isPinned: false,
+      authorId: 'u1',
+      authorName: 'Coach Rivera',
+      prospectId: prospect.id,
+      createdAt: new Date().toISOString(),
+    };
+    // Optimistic update
+    setNotes((prev) => [newNote, ...prev]);
+    setNoteText('');
+    try {
+      await fetch(`/api/prospects/${prospect.id}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newNote.content }),
+      });
+    } catch { /* keep optimistic state */ }
+    setSubmittingNote(false);
+  }
   const scoreColor = (prospect.commitmentScore ?? 0) >= 75
     ? 'text-emerald-400' : (prospect.commitmentScore ?? 0) >= 50
     ? 'text-amber-400' : 'text-gray-400';
@@ -143,14 +272,24 @@ export default function ProspectProfileClient({ params }: { params: { id: string
           <div className="card p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="section-title">Notes & Communication</h2>
-              <button className="btn-primary text-xs py-1.5">+ Add Note</button>
             </div>
-            <div className="mb-4">
+            <form onSubmit={handleAddNote} className="mb-4 space-y-2">
               <textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
                 placeholder="Add a note about this prospect..."
-                className="input min-h-[80px] resize-none text-sm"
+                className="input min-h-[80px] resize-none text-sm w-full"
               />
-            </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={submittingNote || !noteText.trim()}
+                  className="btn-primary text-xs py-1.5 disabled:opacity-50"
+                >
+                  {submittingNote ? 'Adding...' : '+ Add Note'}
+                </button>
+              </div>
+            </form>
             <div className="space-y-3">
               {notes.length === 0 ? (
                 <p className="text-sm text-gray-500 text-center py-6">No notes yet</p>
@@ -213,8 +352,15 @@ export default function ProspectProfileClient({ params }: { params: { id: string
           <div className="card p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="section-title">Evaluations</h2>
-              <button className="btn-secondary text-xs py-1.5">+ Rate</button>
+              <button className="btn-secondary text-xs py-1.5" onClick={() => setShowRateModal(true)}>+ Rate</button>
             </div>
+            {showRateModal && (
+              <RateModal
+                prospectId={prospect.id}
+                onClose={() => setShowRateModal(false)}
+                onSave={(ev) => setEvals((prev) => [ev, ...prev])}
+              />
+            )}
             {evals.length === 0 ? (
               <p className="text-sm text-gray-500 text-center py-4">No evaluations yet</p>
             ) : (
