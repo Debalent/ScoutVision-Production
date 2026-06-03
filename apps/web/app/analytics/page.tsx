@@ -1,14 +1,58 @@
 'use client';
 
-import { useState } from 'react';
-import { PROSPECTS, PIPELINE_METRICS, STAGES, DASHBOARD_STATS } from '../lib/mock-data';
+import { useState, useEffect } from 'react';
+import {
+  PROSPECTS as FALLBACK_PROSPECTS,
+  PIPELINE_METRICS as FALLBACK_METRICS,
+  STAGES,
+  DASHBOARD_STATS as FALLBACK_STATS,
+} from '../lib/mock-data';
 import { cn, pct } from '../lib/utils';
 import StatCard from '../components/StatCard';
+import type { Prospect } from '../lib/types';
 
 type AnalyticsTab = 'pipeline' | 'geographic' | 'positions' | 'predictions';
 
+type Metric = {
+  id: string;
+  type: string;
+  dimension: string | null;
+  value: number;
+  metadata?: unknown;
+};
+
+type DashboardStats = {
+  totalProspects: number;
+  conversionRate: number;
+  avgEvalScore: number | string;
+  committed: number;
+};
+
 export default function AnalyticsPage() {
-  const [activeTab, setActiveTab] = useState<AnalyticsTab>('pipeline');
+  const [activeTab, setActiveTab]  = useState<AnalyticsTab>('pipeline');
+  const [prospects, setProspects]  = useState<Prospect[]>(FALLBACK_PROSPECTS);
+  const [metrics, setMetrics]      = useState<Metric[]>(FALLBACK_METRICS);
+  const [stats, setStats]          = useState<DashboardStats>(FALLBACK_STATS);
+
+  useEffect(() => {
+    fetch('/api/analytics')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!data) return;
+        if (data.dashboardStats) setStats((s) => ({ ...s, ...data.dashboardStats }));
+        if (Array.isArray(data.pipelineMetrics) && data.pipelineMetrics.length > 0)
+          setMetrics(data.pipelineMetrics);
+      })
+      .catch(() => {});
+
+    fetch('/api/prospects')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        const arr = Array.isArray(data) ? data : data?.prospects;
+        if (Array.isArray(arr) && arr.length > 0) setProspects(arr);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -29,10 +73,10 @@ export default function AnalyticsPage() {
 
       {/* Top Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Pipeline Total" value={DASHBOARD_STATS.totalProspects} change="+18 this month" trend="up" />
-        <StatCard label="Conversion Rate" value={`${DASHBOARD_STATS.conversionRate}%`} change="+2.1%" trend="up" />
-        <StatCard label="Avg Eval Score" value={DASHBOARD_STATS.avgEvalScore} change="/10" />
-        <StatCard label="Committed" value={DASHBOARD_STATS.committed} change={`of ${DASHBOARD_STATS.totalProspects}`} />
+        <StatCard label="Pipeline Total" value={stats.totalProspects} change="+18 this month" trend="up" />
+        <StatCard label="Conversion Rate" value={`${stats.conversionRate}%`} change="+2.1%" trend="up" />
+        <StatCard label="Avg Eval Score" value={stats.avgEvalScore} change="/10" />
+        <StatCard label="Committed" value={stats.committed} change={`of ${stats.totalProspects}`} />
       </div>
 
       {/* Tabs */}
@@ -52,20 +96,28 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Content */}
-      {activeTab === 'pipeline' && <PipelineFunnel />}
-      {activeTab === 'geographic' && <GeographicView />}
-      {activeTab === 'positions' && <PositionFill />}
-      {activeTab === 'predictions' && <PredictiveView />}
+      {activeTab === 'pipeline'   && <PipelineFunnel   metrics={metrics} prospects={prospects} dashboardStats={stats} />}
+      {activeTab === 'geographic' && <GeographicView    metrics={metrics} prospects={prospects} />}
+      {activeTab === 'positions'  && <PositionFill      metrics={metrics} />}
+      {activeTab === 'predictions' && <PredictiveView   prospects={prospects} />}
     </div>
   );
 }
 
 // ─── Pipeline Funnel ────────────────────────────────────────────────
 
-function PipelineFunnel() {
-  const conversionMetrics = PIPELINE_METRICS.filter((m) => m.type === 'conversion_rate');
+function PipelineFunnel({
+  metrics,
+  prospects,
+  dashboardStats,
+}: {
+  metrics: Metric[];
+  prospects: Prospect[];
+  dashboardStats: { conversionRate: number };
+}) {
+  const conversionMetrics = metrics.filter((m) => m.type === 'conversion_rate');
   const stageData = STAGES.map((stage) => {
-    const count = PROSPECTS.filter((p) => p.stageId === stage.id).length;
+    const count = prospects.filter((p) => p.stageId === stage.id).length;
     return { ...stage, count };
   });
   const maxCount = Math.max(...stageData.map((s) => s.count), 1);
@@ -134,7 +186,7 @@ function PipelineFunnel() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-400">Overall Pipeline Yield</span>
             <span className="text-lg font-bold text-emerald-400">
-              {pct(DASHBOARD_STATS.conversionRate)}
+              {pct(dashboardStats.conversionRate)}
             </span>
           </div>
           <p className="text-xs text-gray-600 mt-1">
@@ -148,11 +200,11 @@ function PipelineFunnel() {
 
 // ─── Geographic Heatmap ─────────────────────────────────────────────
 
-function GeographicView() {
-  const regionalMetrics = PIPELINE_METRICS.filter((m) => m.type === 'regional_yield');
+function GeographicView({ metrics, prospects }: { metrics: Metric[]; prospects: Prospect[] }) {
+  const regionalMetrics = metrics.filter((m) => m.type === 'regional_yield');
   const maxRegional = Math.max(...regionalMetrics.map((r) => r.value), 1);
 
-  const stateData = PROSPECTS.reduce<Record<string, number>>((acc, p) => {
+  const stateData = prospects.reduce<Record<string, number>>((acc, p) => {
     if (p.state) acc[p.state] = (acc[p.state] || 0) + 1;
     return acc;
   }, {});
@@ -182,13 +234,13 @@ function GeographicView() {
                     }}
                   />
                 </div>
-                {metric.metadata && (
+{metric.metadata ? (
                   <div className="flex flex-wrap gap-1">
-                    {(metric.metadata as { states: string[] }).states?.map((s: string) => (
+                    {(metric.metadata as { states?: string[] }).states?.map((s: string) => (
                       <span key={s} className="text-[10px] text-gray-600">{s}</span>
                     ))}
                   </div>
-                )}
+                ) : null}
               </div>
             );
           })}
@@ -238,8 +290,8 @@ function GeographicView() {
 
 // ─── Position Fill Rates ────────────────────────────────────────────
 
-function PositionFill() {
-  const positionMetrics = PIPELINE_METRICS.filter((m) => m.type === 'position_fill');
+function PositionFill({ metrics }: { metrics: Metric[] }) {
+  const positionMetrics = metrics.filter((m) => m.type === 'position_fill');
 
   return (
     <div className="space-y-6">
@@ -322,8 +374,8 @@ function PositionFill() {
 
 // ─── Predictive View ────────────────────────────────────────────────
 
-function PredictiveView() {
-  const rankedProspects = PROSPECTS
+function PredictiveView({ prospects }: { prospects: Prospect[] }) {
+  const rankedProspects = prospects
     .filter((p) => p.commitmentScore !== null && p.status === 'active')
     .sort((a, b) => (b.commitmentScore ?? 0) - (a.commitmentScore ?? 0));
 
